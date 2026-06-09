@@ -1,0 +1,16 @@
+{
+  "name": "rebate-tracker",
+  "version": "1.0.0",
+  "description": "达人返点管理 - 多人共享版",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

@@ -2,6 +2,7 @@ services:
   - type: web
     name: rebate-tracker
     runtime: node
+    plan: free
     buildCommand: npm install
     startCommand: npm start
     healthCheckPath: /api/health

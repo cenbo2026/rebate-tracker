@@ -1,0 +1,1725 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>26年项目内部返点管理</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg:         #f5f6fa;
+  --bg2:        #ffffff;
+  --surface:    #ffffff;
+  --border:     #e4e8f0;
+  --border2:    #d0d6e4;
+  --accent:     #4f6ef7;
+  --accent-lt:  #eef1fe;
+  --green:      #1cb87e;
+  --green-lt:   #e6f8f2;
+  --amber:      #f59e0b;
+  --amber-lt:   #fef3cd;
+  --red:        #ef4444;
+  --red-lt:     #fef2f2;
+  --blue:       #3b82f6;
+  --blue-lt:    #eff6ff;
+  --purple:     #8b5cf6;
+  --purple-lt:  #f5f3ff;
+  --text:       #1e2535;
+  --text2:      #5a6680;
+  --text3:      #9aa3ba;
+  --row-hover:  #f0f3ff;
+  --header-bg:  #f8f9fc;
+  --radius:     8px;
+  --shadow:     0 1px 4px rgba(80,100,180,0.08);
+  --shadow-md:  0 4px 20px rgba(80,100,180,0.12);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Noto Sans SC', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13px;
+  min-height: 100vh;
+}
+
+/* ── Header ── */
+.header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.logo {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, var(--accent), #7c9ef9);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  color: white;
+  flex-shrink: 0;
+}
+
+.header-title { font-size: 16px; font-weight: 700; color: var(--text); }
+.header-sub   { font-size: 11px; color: var(--text3); margin-top: 1px; }
+
+.header-right { display: flex; align-items: center; gap: 8px; }
+
+.project-sel {
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  padding: 6px 12px;
+  border-radius: var(--radius);
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+}
+
+.btn {
+  padding: 7px 14px;
+  border-radius: var(--radius);
+  border: none;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.18s;
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: #3d5ce8; }
+.btn-ghost { background: transparent; color: var(--text2); border: 1px solid var(--border2); }
+.btn-ghost:hover { background: var(--bg); color: var(--text); }
+.btn-success { background: var(--green); color: #fff; }
+.btn-success:hover { background: #17a36f; }
+.btn-sm { padding: 5px 10px; font-size: 11px; }
+
+/* ── Stats ── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 14px;
+  padding: 18px 28px 14px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  box-shadow: var(--shadow);
+}
+
+.stat-label { font-size: 11px; color: var(--text3); margin-bottom: 6px; font-weight: 500; letter-spacing: 0.3px; }
+.stat-value { font-size: 20px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+.stat-sub   { font-size: 11px; color: var(--text3); margin-top: 3px; }
+.c-accent  { color: var(--accent); }
+.c-green   { color: var(--green); }
+.c-amber   { color: var(--amber); }
+.c-red     { color: var(--red); }
+.c-text    { color: var(--text); }
+
+/* ── Toolbar ── */
+.toolbar {
+  padding: 0 28px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.search-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 180px;
+  max-width: 300px;
+}
+.search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text3); }
+.search-wrap input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  padding: 7px 10px 7px 32px;
+  border-radius: var(--radius);
+  font-size: 12px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.18s;
+}
+.search-wrap input:focus { border-color: var(--accent); }
+
+.pills { display: flex; gap: 5px; flex-wrap: wrap; }
+.pill {
+  padding: 5px 13px;
+  border-radius: 20px;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--text2);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.18s;
+  font-family: inherit;
+}
+.pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.pill:hover:not(.active) { background: var(--bg); color: var(--text); }
+
+.filter-select {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  color: var(--text2);
+  padding: 6px 10px;
+  border-radius: var(--radius);
+  font-size: 12px;
+  font-family: inherit;
+  outline: none;
+}
+
+.row-count { font-size: 11px; color: var(--text3); margin-left: auto; white-space: nowrap; }
+
+/* ── Table ── */
+.table-container {
+  margin: 0 28px 28px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.table-scroll { overflow-x: auto; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+thead th {
+  background: var(--header-bg);
+  padding: 10px 12px;
+  text-align: left;
+  font-size: 11px;
+  color: var(--text2);
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  user-select: none;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+thead th:hover { color: var(--accent); }
+thead th.sort-asc::after  { content: ' ↑'; color: var(--accent); }
+thead th.sort-desc::after { content: ' ↓'; color: var(--accent); }
+
+thead th.sticky-col { position: sticky; left: 0; z-index: 2; background: var(--header-bg); }
+tbody td.sticky-col { position: sticky; left: 0; z-index: 1; background: var(--surface); }
+tbody tr:hover td.sticky-col { background: var(--row-hover); }
+
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.12s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--row-hover); }
+tbody td { padding: 10px 12px; vertical-align: middle; }
+
+/* badges / tags */
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.badge-green  { background: var(--green-lt);  color: var(--green); }
+.badge-amber  { background: var(--amber-lt);  color: #b45309; }
+.badge-red    { background: var(--red-lt);    color: var(--red); }
+.badge-blue   { background: var(--blue-lt);   color: var(--blue); }
+.badge-purple { background: var(--purple-lt); color: var(--purple); }
+.badge-gray   { background: #f1f3f8; color: var(--text2); }
+
+.dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; margin-right: 4px; flex-shrink: 0; }
+.dot-green  { background: var(--green); }
+.dot-amber  { background: var(--amber); animation: blink 2s infinite; }
+.dot-red    { background: var(--red); }
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.35} }
+
+/* progress */
+.prog-wrap { display: flex; align-items: center; gap: 6px; min-width: 100px; }
+.prog-bar  { flex: 1; height: 5px; background: var(--bg); border-radius: 3px; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 3px; transition: width .4s ease; }
+.prog-pct  { font-size: 11px; font-family: 'JetBrains Mono', monospace; width: 32px; text-align: right; color: var(--text2); }
+
+.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+
+.inf-cell { display: flex; flex-direction: column; gap: 1px; }
+.inf-name { font-weight: 600; color: var(--text); }
+.inf-id   { font-size: 10px; color: var(--text3); }
+
+.note-col { max-width: 120px; overflow: hidden; text-overflow: ellipsis; color: var(--text3); }
+
+/* Empty */
+.empty-state { text-align: center; padding: 48px; color: var(--text3); }
+.empty-state .icon { font-size: 36px; margin-bottom: 10px; }
+.empty-state p { font-size: 14px; color: var(--text2); }
+.empty-state small { font-size: 12px; }
+
+/* ── Modal ── */
+.overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(30,37,53,.45);
+  backdrop-filter: blur(3px);
+  z-index: 300;
+  align-items: center; justify-content: center;
+}
+.overlay.open { display: flex; }
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  width: 560px; max-width: 95vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 50px rgba(30,37,53,.18);
+  animation: fadeUp .22s ease;
+}
+@keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+.modal-hd {
+  padding: 22px 26px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: flex-start; justify-content: space-between;
+}
+.modal-title { font-size: 16px; font-weight: 700; }
+.modal-sub   { font-size: 12px; color: var(--text3); margin-top: 3px; }
+.modal-close { background: none; border: none; color: var(--text3); font-size: 18px; cursor: pointer; line-height:1; padding: 2px 6px; border-radius: 4px; }
+.modal-close:hover { background: var(--bg); color: var(--text); }
+
+.modal-bd { padding: 22px 26px; }
+
+.info-grid-2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 20px; }
+.info-card { background: var(--bg); border-radius: 8px; padding: 12px 14px; }
+.info-card-lbl { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 5px; }
+.info-card-val { font-size: 17px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+
+.section-title { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; font-weight: 600; }
+
+.pay-log { margin-bottom: 18px; }
+.pay-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 9px 12px; background: var(--bg); border-radius: 7px; margin-bottom: 5px;
+}
+.pay-item-l { display: flex; align-items: center; gap: 9px; }
+.pay-icon { width: 26px; height: 26px; border-radius: 50%; background: var(--green-lt); color: var(--green); display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
+.pay-method { font-size: 12px; color: var(--text2); }
+.pay-date   { font-size: 11px; color: var(--text3); }
+.pay-note   { font-size: 11px; color: var(--text3); }
+.pay-amount { font-family: 'JetBrains Mono', monospace; color: var(--green); font-weight: 600; font-size: 13px; }
+.no-pay { background: var(--bg); border-radius: 7px; padding: 16px; text-align: center; font-size: 12px; color: var(--text3); }
+
+.add-pay-box {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+.add-pay-title { font-size: 13px; font-weight: 600; margin-bottom: 14px; color: var(--text); }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.form-col { display: flex; flex-direction: column; gap: 5px; }
+.form-col label { font-size: 11px; color: var(--text2); font-weight: 500; }
+.form-col input,
+.form-col select,
+.form-col textarea {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  padding: 7px 10px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color .18s;
+  width: 100%;
+}
+.form-col input:focus, .form-col select:focus, .form-col textarea:focus { border-color: var(--accent); }
+.form-col textarea { resize: vertical; min-height: 52px; }
+
+.form-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
+
+/* ── Add influencer ── */
+.add-section { margin-bottom: 14px; }
+.add-section-title { font-size: 12px; color: var(--text2); font-weight: 600; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+
+/* ── Toast ── */
+.toast-box { position: fixed; bottom: 24px; right: 24px; z-index: 999; display: flex; flex-direction: column; gap: 7px; pointer-events: none; }
+.toast {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  color: var(--text);
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  display: flex; align-items: center; gap: 9px;
+  animation: toastIn .25s ease;
+  pointer-events: all;
+}
+.toast.s { border-left: 3px solid var(--green); }
+.toast.e { border-left: 3px solid var(--red); }
+@keyframes toastIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── Responsive ── */
+@media(max-width:900px) {
+  .stats-row { grid-template-columns: repeat(3,1fr); }
+  .header, .toolbar, .table-container { margin-left: 14px; margin-right: 14px; padding-left: 14px; padding-right: 14px; }
+  .stats-row { padding: 14px; }
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+/* ── Import Modal ── */
+.import-drop-zone {
+  border: 2px dashed var(--border2);
+  border-radius: 12px;
+  padding: 36px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .2s;
+  background: var(--bg);
+  margin-bottom: 16px;
+}
+.import-drop-zone:hover,
+.import-drop-zone.drag-over {
+  border-color: var(--accent);
+  background: var(--accent-lt);
+}
+.import-drop-zone .drop-icon { font-size: 36px; margin-bottom: 10px; }
+.import-drop-zone .drop-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 5px; }
+.import-drop-zone .drop-sub   { font-size: 12px; color: var(--text3); }
+.import-drop-zone .drop-hint  { font-size: 11px; color: var(--accent); margin-top: 8px; }
+
+.col-map-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 14px; }
+.col-map-table th { background: var(--header-bg); padding: 7px 10px; text-align: left; font-size: 11px; color: var(--text2); font-weight: 600; border-bottom: 1px solid var(--border); }
+.col-map-table td { padding: 6px 10px; border-bottom: 1px solid var(--border); }
+.col-map-table td select { width: 100%; background: var(--surface); border: 1px solid var(--border2); color: var(--text); padding: 4px 8px; border-radius: 5px; font-size: 11px; font-family: inherit; outline: none; }
+.col-map-table td.preview-val { color: var(--text3); max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.import-preview-info { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+.import-chip { background: var(--bg); border: 1px solid var(--border); border-radius: 20px; padding: 4px 12px; font-size: 11px; color: var(--text2); }
+.import-chip strong { color: var(--accent); }
+
+.import-mode-row { display: flex; gap: 10px; margin-bottom: 16px; }
+.import-mode-btn {
+  flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border2);
+  background: var(--bg); cursor: pointer; text-align: center; transition: all .18s; font-family: inherit;
+}
+.import-mode-btn.active { border-color: var(--accent); background: var(--accent-lt); }
+.import-mode-btn .mode-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+.import-mode-btn.active .mode-title { color: var(--accent); }
+.import-mode-btn .mode-sub   { font-size: 11px; color: var(--text3); }
+
+.step-indicator { display: flex; align-items: center; gap: 0; margin-bottom: 20px; }
+.step { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text3); }
+.step.active { color: var(--accent); font-weight: 600; }
+.step.done   { color: var(--green); }
+.step-num { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid currentColor; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+.step-sep { flex: 1; height: 1px; background: var(--border); margin: 0 8px; min-width: 20px; }
+
+.sync-status {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; color: var(--text3);
+  padding: 5px 10px; border-radius: var(--radius);
+  background: var(--bg); border: 1px solid var(--border);
+}
+.sync-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text3); }
+.sync-status.synced .sync-dot { background: var(--green); }
+.sync-status.saving .sync-dot { background: var(--amber); animation: pulse 1s infinite; }
+.sync-status.error .sync-dot { background: var(--red); }
+.sync-status.offline .sync-dot { background: var(--red); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+.auth-overlay {
+  position: fixed; inset: 0; background: rgba(30,37,53,.55);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999;
+}
+.auth-box {
+  background: var(--surface); border-radius: 12px; padding: 28px 32px;
+  width: 360px; box-shadow: var(--shadow-md);
+}
+.auth-box h2 { font-size: 16px; margin-bottom: 6px; }
+.auth-box p { font-size: 12px; color: var(--text2); margin-bottom: 16px; }
+.auth-box input {
+  width: 100%; padding: 9px 12px; border: 1px solid var(--border2);
+  border-radius: var(--radius); font-size: 13px; font-family: inherit;
+  margin-bottom: 12px; outline: none;
+}
+.auth-box input:focus { border-color: var(--accent); }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-left">
+    <div class="logo">📊</div>
+    <div>
+      <div class="header-title">26年项目内部返点管理</div>
+      <div class="header-sub">达人合作 · 返点收回追踪系统</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="sync-status synced" id="syncStatus" title="多人共享 · 自动同步">
+      <span class="sync-dot"></span>
+      <span id="syncText">已同步</span>
+    </span>
+    <select class="project-sel" id="projSel" onchange="switchProject()">
+      <option value="proj1">2026年春季美妆专项</option>
+      <option value="proj2">年货节生活好物</option>
+      <option value="proj3">618美食探店计划</option>
+    </select>
+    <button class="btn btn-ghost" onclick="openImportModal()">📥 导入Excel</button>
+    <button class="btn btn-ghost" onclick="exportCSV()">📤 导出CSV</button>
+    <button class="btn btn-primary" onclick="openAddModal()">＋ 新增达人</button>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="stats-row" id="statsRow"></div>
+
+<!-- Toolbar -->
+<div class="toolbar">
+  <div class="search-wrap">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" id="searchInput" placeholder="搜索达人账号、项目名称…" oninput="render()">
+  </div>
+  <div class="pills">
+    <button class="pill active" onclick="setFilter('all',this)">全部</button>
+    <button class="pill" onclick="setFilter('pending',this)">未收款</button>
+    <button class="pill" onclick="setFilter('partial',this)">部分收回</button>
+    <button class="pill" onclick="setFilter('full',this)">已全额</button>
+  </div>
+  <select class="filter-select" id="monthFilter" onchange="render()">
+    <option value="">全部月份</option>
+    <option value="1月">1月</option>
+    <option value="2月">2月</option>
+    <option value="3月">3月</option>
+    <option value="4月">4月</option>
+    <option value="5月">5月</option>
+    <option value="6月">6月</option>
+    <option value="7月">7月</option>
+    <option value="8月">8月</option>
+    <option value="9月">9月</option>
+    <option value="10月">10月</option>
+    <option value="11月">11月</option>
+    <option value="12月">12月</option>
+  </select>
+  <select class="filter-select" id="typeFilter" onchange="render()">
+    <option value="">全部合作类型</option>
+    <option value="图文笔记">图文笔记</option>
+    <option value="视频笔记">视频笔记</option>
+  </select>
+  <select class="filter-select" id="attrFilter" onchange="render()">
+    <option value="">全部返点归属</option>
+    <option value="科收自行回收">科收自行回收</option>
+    <option value="个人">个人</option>
+    <option value="达人星球">达人星球</option>
+    <option value="西西里">西西里</option>
+    <option value="高端">高端</option>
+  </select>
+  <span class="row-count" id="rowCount"></span>
+</div>
+
+<!-- Table -->
+<div class="table-container">
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th onclick="sort('seq')">序号</th>
+          <th onclick="sort('medium')">媒介</th>
+          <th onclick="sort('month')">订单月</th>
+          <th onclick="sort('orderDate')">订单日期</th>
+          <th onclick="sort('projectName')">项目名称</th>
+          <th onclick="sort('account')">达人账号</th>
+          <th onclick="sort('kukerId')">库客ID</th>
+          <th onclick="sort('quotePrice')">达人报价</th>
+          <th onclick="sort('quotePriceWithFee')">含服务费报价(+10%)</th>
+          <th onclick="sort('coopType')">合作类型</th>
+          <th onclick="sort('rebateRate')">返点比例</th>
+          <th onclick="sort('rebateAmount')">返点金额</th>
+          <th onclick="sort('rebateAttr')">返点归属</th>
+          <th onclick="sort('deduction')">安装/快递抵扣</th>
+          <th onclick="sort('actualRebate')">实际返点金额</th>
+          <th onclick="sort('isRebate')">是否返点</th>
+          <th onclick="sort('collected')">已收金额</th>
+          <th>收回进度</th>
+          <th onclick="sort('status')">回收状态</th>
+          <th onclick="sort('institution')">挂靠机构</th>
+          <th>备注</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div id="emptyState" class="empty-state" style="display:none">
+      <div class="icon">🔍</div>
+      <p>暂无匹配数据</p>
+      <small>调整筛选条件试试</small>
+    </div>
+  </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="overlay" id="detailOverlay" onclick="closeBg(event,'detailOverlay')">
+  <div class="modal">
+    <div class="modal-hd">
+      <div>
+        <div class="modal-title" id="d-name"></div>
+        <div class="modal-sub" id="d-sub"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal('detailOverlay')">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="info-grid-2">
+        <div class="info-card">
+          <div class="info-card-lbl">实际返点金额</div>
+          <div class="info-card-val c-amber" id="d-rebate"></div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-lbl">已收回金额</div>
+          <div class="info-card-val c-green" id="d-collected"></div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-lbl">待收余额</div>
+          <div class="info-card-val c-red" id="d-remaining"></div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-lbl">收回进度</div>
+          <div class="info-card-val c-accent" id="d-pct"></div>
+        </div>
+      </div>
+
+      <div class="pay-log">
+        <div class="section-title">收款记录</div>
+        <div id="payList"></div>
+      </div>
+
+      <div class="add-pay-box">
+        <div class="add-pay-title">📥 登记收款</div>
+        <div class="form-row">
+          <div class="form-col">
+            <label>收款金额（元）</label>
+            <input type="number" id="payAmt" placeholder="0.00" min="0" step="0.01">
+          </div>
+          <div class="form-col">
+            <label>收款日期</label>
+            <input type="date" id="payDate">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-col">
+            <label>收款方式</label>
+            <select id="payMethod">
+              <option>微信转账</option>
+              <option>支付宝</option>
+              <option>银行转账</option>
+              <option>线下现金</option>
+              <option>其他</option>
+            </select>
+          </div>
+          <div class="form-col">
+            <label>备注</label>
+            <input type="text" id="payNote" placeholder="可选备注…">
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-ghost" onclick="closeModal('detailOverlay')">取消</button>
+          <button class="btn btn-success" onclick="addPayment()">✓ 确认收款</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Modal -->
+<div class="overlay" id="addOverlay" onclick="closeBg(event,'addOverlay')">
+  <div class="modal">
+    <div class="modal-hd">
+      <div>
+        <div class="modal-title">新增达人</div>
+        <div class="modal-sub">填写完整合作信息</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('addOverlay')">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="add-section">
+        <div class="add-section-title">基本信息</div>
+        <div class="form-row">
+          <div class="form-col"><label>媒介</label>
+            <select id="a-medium"><option>莉莉</option><option>金苗</option><option>李品</option><option>其他</option></select>
+          </div>
+          <div class="form-col"><label>订单完成月</label>
+            <select id="a-month">
+              <option>1月</option><option>2月</option><option>3月</option><option>4月</option>
+              <option>5月</option><option>6月</option><option>7月</option><option>8月</option>
+              <option>9月</option><option>10月</option><option>11月</option><option>12月</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-col"><label>订单完成时间</label>
+            <input type="date" id="a-orderDate">
+          </div>
+          <div class="form-col"><label>达人账号 *</label>
+            <input type="text" id="a-account" placeholder="账号名称">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-col"><label>项目名称</label>
+            <input type="text" id="a-project" placeholder="DY开头的项目号">
+          </div>
+          <div class="form-col"><label>库客ID</label>
+            <input type="text" id="a-kukerId" placeholder="库客平台ID">
+          </div>
+        </div>
+      </div>
+
+      <div class="add-section">
+        <div class="add-section-title">合作与返点</div>
+        <div class="form-row">
+          <div class="form-col"><label>达人报价（元）*</label>
+            <input type="number" id="a-quote" placeholder="0.00" min="0" step="0.01">
+          </div>
+          <div class="form-col"><label>合作类型</label>
+            <select id="a-coopType"><option>图文笔记</option><option>视频笔记</option></select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-col"><label>返点比例（%）*</label>
+            <input type="number" id="a-rate" placeholder="如 35" min="0" max="100" step="0.1">
+          </div>
+          <div class="form-col"><label>返点归属</label>
+            <select id="a-attr">
+              <option>科收自行回收</option>
+              <option>个人</option>
+              <option>达人星球</option>
+              <option>西西里</option>
+              <option>高端</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-col"><label>安装/快递费抵扣（元）</label>
+            <input type="number" id="a-deduction" placeholder="0.00" min="0" step="0.01" value="0">
+          </div>
+          <div class="form-col"><label>是否返点</label>
+            <select id="a-isRebate"><option value="是">是</option><option value="否">否</option><option value="">待确认</option></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="add-section">
+        <div class="add-section-title">其他</div>
+        <div class="form-row">
+          <div class="form-col"><label>挂靠机构</label>
+            <input type="text" id="a-institution" placeholder="机构名称">
+          </div>
+          <div class="form-col"><label>备注</label>
+            <input type="text" id="a-note" placeholder="可选">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-ghost" onclick="closeModal('addOverlay')">取消</button>
+        <button class="btn btn-primary" onclick="submitAdd()">✓ 添加</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Import Modal -->
+<div class="overlay" id="importOverlay" onclick="closeBg(event,'importOverlay')">
+  <div class="modal" style="width:680px">
+    <div class="modal-hd">
+      <div>
+        <div class="modal-title">导入 Excel / CSV 文件</div>
+        <div class="modal-sub">支持 .xlsx · .xls · .csv，自动识别列名并映射</div>
+      </div>
+      <button class="modal-close" onclick="closeImport()">✕</button>
+    </div>
+    <div class="modal-bd">
+
+      <!-- Step indicator -->
+      <div class="step-indicator">
+        <div class="step" id="step1-ind"><div class="step-num">1</div> 上传文件</div>
+        <div class="step-sep"></div>
+        <div class="step" id="step2-ind"><div class="step-num">2</div> 映射列</div>
+        <div class="step-sep"></div>
+        <div class="step" id="step3-ind"><div class="step-num">3</div> 导入选项</div>
+      </div>
+
+      <!-- Step 1: Upload -->
+      <div id="importStep1">
+        <div class="import-drop-zone" id="dropZone"
+          onclick="document.getElementById('fileInput').click()"
+          ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+          <div class="drop-icon">📂</div>
+          <div class="drop-title">点击选择或拖拽文件到此处</div>
+          <div class="drop-sub">支持 Excel (.xlsx .xls) 和 CSV (.csv) 格式</div>
+          <div class="drop-hint">↓ 点击下载模板文件</div>
+        </div>
+        <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleFile(event)">
+        <div style="text-align:center;margin-top:4px">
+          <button class="btn btn-ghost btn-sm" onclick="downloadTemplate()">⬇ 下载导入模板</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Column mapping -->
+      <div id="importStep2" style="display:none">
+        <div class="import-preview-info" id="previewInfo"></div>
+
+        <div class="section-title" style="margin-bottom:10px">列映射 <span style="color:var(--text3);font-weight:400">— 将Excel列对应到系统字段（已自动识别）</span></div>
+        <div style="max-height:300px;overflow-y:auto;border:1px solid var(--border);border-radius:8px">
+          <table class="col-map-table">
+            <thead><tr><th>Excel 列名</th><th>示例数据</th><th>对应系统字段</th></tr></thead>
+            <tbody id="colMapBody"></tbody>
+          </table>
+        </div>
+        <div class="form-actions" style="margin-top:14px">
+          <button class="btn btn-ghost" onclick="goStep(1)">← 重新上传</button>
+          <button class="btn btn-primary" onclick="goStep(3)">下一步 →</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Import options -->
+      <div id="importStep3" style="display:none">
+        <div class="section-title" style="margin-bottom:10px">导入方式</div>
+        <div class="import-mode-row">
+          <button class="import-mode-btn active" id="modeAppend" onclick="setImportMode('append')">
+            <div class="mode-title">追加导入</div>
+            <div class="mode-sub">在现有数据后面添加新行</div>
+          </button>
+          <button class="import-mode-btn" id="modeReplace" onclick="setImportMode('replace')">
+            <div class="mode-title">替换导入</div>
+            <div class="mode-sub">清空当前项目数据后导入</div>
+          </button>
+          <button class="import-mode-btn" id="modeSkipDup" onclick="setImportMode('skipdup')">
+            <div class="mode-title">跳过重复</div>
+            <div class="mode-sub">按达人账号去重，跳过已存在的行</div>
+          </button>
+        </div>
+
+        <div class="import-preview-info" id="importSummary"></div>
+
+        <div class="section-title" style="margin-bottom:8px">数据预览（前5行）</div>
+        <div style="overflow-x:auto;border:1px solid var(--border);border-radius:8px;max-height:200px;overflow-y:auto">
+          <table class="col-map-table" id="previewTable"></table>
+        </div>
+
+        <div class="form-actions" style="margin-top:14px">
+          <button class="btn btn-ghost" onclick="goStep(2)">← 修改映射</button>
+          <button class="btn btn-success" onclick="confirmImport()" id="confirmImportBtn">✓ 确认导入</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast-box" id="toastBox"></div>
+
+<!-- 访问密钥 -->
+<div class="auth-overlay" id="authOverlay" style="display:none">
+  <div class="auth-box">
+    <h2>🔐 输入访问密钥</h2>
+    <p>此工具为团队内部使用，请输入管理员提供的密钥以访问共享数据。</p>
+    <input type="password" id="authKeyInput" placeholder="访问密钥" onkeydown="if(event.key==='Enter')submitAuth()">
+    <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="submitAuth()">进入系统</button>
+  </div>
+</div>
+
+<script>
+// ── Cloud sync ──────────────────────────────────────
+const KEY = 'rebate_26_v3';
+const ACCESS_KEY_STORAGE = 'rebate_access_key';
+let dbVersion = 0;
+let saveTimer = null;
+let pendingSave = false;
+let pollTimer = null;
+let authRequired = false;
+
+function getAccessKey() {
+  return sessionStorage.getItem(ACCESS_KEY_STORAGE) || '';
+}
+
+function authHeaders() {
+  const key = getAccessKey();
+  return key ? { 'X-Access-Key': key } : {};
+}
+
+function setSyncStatus(state, text) {
+  const el = document.getElementById('syncStatus');
+  const txt = document.getElementById('syncText');
+  el.className = 'sync-status ' + state;
+  if (text) txt.textContent = text;
+  else if (state === 'synced') txt.textContent = '已同步';
+  else if (state === 'saving') txt.textContent = '保存中…';
+  else if (state === 'error') txt.textContent = '同步失败';
+  else if (state === 'offline') txt.textContent = '连接断开';
+}
+
+function showAuth() {
+  document.getElementById('authOverlay').style.display = 'flex';
+  document.getElementById('authKeyInput').focus();
+}
+
+function hideAuth() {
+  document.getElementById('authOverlay').style.display = 'none';
+}
+
+async function submitAuth() {
+  const key = document.getElementById('authKeyInput').value.trim();
+  if (!key) { toast('请输入访问密钥', 'e'); return; }
+  sessionStorage.setItem(ACCESS_KEY_STORAGE, key);
+  try {
+    await loadFromServer();
+    hideAuth();
+    await migrateLocalData();
+    renderStats(); render();
+    startPolling();
+    toast('验证成功，已连接共享数据', 's');
+  } catch (e) {
+    sessionStorage.removeItem(ACCESS_KEY_STORAGE);
+    toast(e.message || '密钥无效', 'e');
+  }
+}
+
+async function ensureAuth() {
+  const health = await fetch('/api/health').then(r => r.json());
+  authRequired = health.authRequired;
+  if (!authRequired) {
+    await loadFromServer();
+    return;
+  }
+  if (getAccessKey()) {
+    try {
+      await loadFromServer();
+      return;
+    } catch (_) {
+      sessionStorage.removeItem(ACCESS_KEY_STORAGE);
+    }
+  }
+  showAuth();
+  throw new Error('pending_auth');
+}
+
+async function loadFromServer() {
+  setSyncStatus('saving', '加载中…');
+  const res = await fetch('/api/data', { headers: authHeaders() });
+  if (res.status === 401) {
+    sessionStorage.removeItem(ACCESS_KEY_STORAGE);
+    showAuth();
+    throw new Error('需要访问密钥');
+  }
+  if (!res.ok) throw new Error('加载数据失败');
+  const json = await res.json();
+  db = json.data && Object.keys(json.data).length ? json.data : clone(defaultData);
+  dbVersion = json.version;
+  if (!db[curProj]) db[curProj] = [];
+  setSyncStatus('synced');
+}
+
+async function flushSave() {
+  if (!pendingSave) return;
+  pendingSave = false;
+  setSyncStatus('saving');
+  try {
+    const res = await fetch('/api/data', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      body: JSON.stringify({ version: dbVersion, data: db }),
+    });
+    if (res.status === 401) {
+      sessionStorage.removeItem(ACCESS_KEY_STORAGE);
+      showAuth();
+      setSyncStatus('error');
+      return;
+    }
+    if (res.status === 409) {
+      const conflict = await res.json();
+      db = conflict.data || db;
+      dbVersion = conflict.version;
+      if (!db[curProj]) db[curProj] = [];
+      renderStats(); render();
+      setSyncStatus('synced');
+      toast('数据已被其他人更新，已自动刷新', 'e');
+      return;
+    }
+    if (!res.ok) throw new Error('save failed');
+    const json = await res.json();
+    dbVersion = json.version;
+    setSyncStatus('synced');
+  } catch (e) {
+    setSyncStatus('error');
+    toast('保存失败，请检查网络', 'e');
+  }
+}
+
+function save() {
+  pendingSave = true;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(flushSave, 400);
+}
+
+function startPolling() {
+  if (pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(async () => {
+    if (pendingSave || document.getElementById('authOverlay').style.display === 'flex') return;
+    try {
+      const res = await fetch('/api/data', { headers: authHeaders() });
+      if (!res.ok) return;
+      const json = await res.json();
+      if (json.version > dbVersion) {
+        db = json.data;
+        dbVersion = json.version;
+        if (!db[curProj]) db[curProj] = [];
+        renderStats(); render();
+        setSyncStatus('synced');
+        toast('已同步其他人的更新', 's');
+      }
+    } catch (_) {
+      setSyncStatus('offline');
+    }
+  }, 4000);
+}
+
+async function migrateLocalData() {
+  try {
+    const local = localStorage.getItem(KEY);
+    if (!local) return;
+    const localDb = JSON.parse(local);
+    const hasLocal = Object.values(localDb).some(arr => Array.isArray(arr) && arr.length > 0);
+    const hasServer = Object.values(db).some(arr => Array.isArray(arr) && arr.length > 0);
+    if (hasLocal && !hasServer && confirm('检测到浏览器中有本地数据，是否上传到共享服务器？\n（仅首次部署时执行）')) {
+      db = localDb;
+      dbVersion = 0;
+      pendingSave = true;
+      await flushSave();
+      renderStats(); render();
+      toast('本地数据已上传到服务器', 's');
+    }
+  } catch (_) {}
+}
+
+// ── Sample data matching the Excel structure ─────
+const defaultData = {
+  proj1: [
+    {id:1,  seq:1,  medium:'莉莉', month:'1月', orderDate:'2026-01-15', projectName:'DY2026004科收26Q1小红书种草', account:'每日品牌料普', kukerId:'66a8f61c000000000b033474', quotePrice:1400, coopType:'图文笔记', rebateRate:35, rebateAttr:'科收自行回收', deduction:0, isRebate:'', payments:[], institution:'', note:''},
+    {id:2,  seq:2,  medium:'莉莉', month:'1月', orderDate:'2026-01-15', projectName:'DY2026004科收26Q1小红书种草', account:'完女Amy的美妆日记', kukerId:'5d2fb4ae000000000011001aae', quotePrice:5000, coopType:'图文笔记', rebateRate:40, rebateAttr:'科收自行回收', deduction:0, isRebate:'', payments:[], institution:'', note:''},
+    {id:3,  seq:3,  medium:'金苗', month:'1月', orderDate:'2026-01-12', projectName:'DY2025116创维旺季产品站外营销', account:'克同学生家', kukerId:'59e8b3df11be106ebbec575b', quotePrice:2000, coopType:'图文笔记', rebateRate:35, rebateAttr:'科收自行回收', deduction:0, isRebate:'是', payments:[{amount:700, date:'2026-02-01', method:'微信转账', note:''}], institution:'', note:'回收完成'},
+    {id:4,  seq:4,  medium:'金苗', month:'1月', orderDate:'2026-01-12', projectName:'DY2025116创维旺季产品站外营销', account:'Ryan的装修日记', kukerId:'162b07a5000000000700661b', quotePrice:1500, coopType:'图文笔记', rebateRate:35, rebateAttr:'高端', deduction:0, isRebate:'是', payments:[{amount:525, date:'2026-02-05', method:'支付宝', note:''}], institution:'', note:'回收完成'},
+    {id:5,  seq:5,  medium:'李品', month:'1月', orderDate:'2026-01-18', projectName:'DY2025116创维旺季产品站外营销', account:'大美集市91', kukerId:'5ca75130000000000001e4', quotePrice:8500, coopType:'图文笔记', rebateRate:35, rebateAttr:'个人', deduction:0, isRebate:'是', payments:[{amount:1500, date:'2026-02-10', method:'银行转账', note:'第一笔'}], institution:'', note:''},
+    {id:6,  seq:6,  medium:'李品', month:'1月', orderDate:'2026-01-20', projectName:'DY2025099-梦百合特斯拉-古姆', account:'古姆学长', kukerId:'5e4b62d100000000100568', quotePrice:7000, coopType:'图文笔记', rebateRate:30, rebateAttr:'个人', deduction:0, isRebate:'是', payments:[], institution:'', note:''},
+    {id:7,  seq:7,  medium:'金苗', month:'1月', orderDate:'2026-01-10', projectName:'DY2025116创维旺季产品站外营销', account:'珑瑞家居测评', kukerId:'65ffe7c500000000c00d2ca', quotePrice:9300, coopType:'图文笔记', rebateRate:35, rebateAttr:'个人', deduction:0, isRebate:'', payments:[], institution:'', note:''},
+    {id:8,  seq:8,  medium:'金苗', month:'1月', orderDate:'2026-01-10', projectName:'DY2025116创维旺季产品站外营销', account:'烛燃慢生记', kukerId:'67b4b6520000000000012423', quotePrice:1500, coopType:'图文笔记', rebateRate:35, rebateAttr:'高端', deduction:0, isRebate:'是', payments:[{amount:525, date:'2026-02-03', method:'微信转账', note:''}], institution:'', note:'回收完成'},
+    {id:9,  seq:9,  medium:'李品', month:'1月', orderDate:'2026-01-22', projectName:'DY2024fb65000000000012', account:'夏夏Orange', kukerId:'16280000000000004736', quotePrice:14800, coopType:'图文笔记', rebateRate:35, rebateAttr:'个人', deduction:442.41, isRebate:'是', payments:[{amount:4000, date:'2026-02-15', method:'银行转账', note:''},{amount:293.59, date:'2026-03-01', method:'微信转账', note:'尾款'}], institution:'', note:'回收完成'},
+    {id:10, seq:10, medium:'李品', month:'1月', orderDate:'2026-01-25', projectName:'DY2025064老板电冰箱金大全', account:'金大全Home(硬装中)', kukerId:'616e67fa000000001000ae53', quotePrice:22000, coopType:'视频笔记', rebateRate:35, rebateAttr:'个人', deduction:0, isRebate:'是', payments:[{amount:3000, date:'2026-02-20', method:'支付宝', note:''}], institution:'', note:''},
+    {id:11, seq:11, medium:'金苗', month:'1月', orderDate:'2026-01-08', projectName:'DY2025118-TCL小蓝屏P7U', account:'江半不是江半', kukerId:'8667f2db000000000700b7a', quotePrice:7500, coopType:'视频笔记', rebateRate:35, rebateAttr:'个人', deduction:1049, isRebate:'是', payments:[{amount:1576, date:'2026-02-08', method:'微信转账', note:''}], institution:'', note:'回收完成'},
+    {id:12, seq:12, medium:'金苗', month:'1月', orderDate:'2026-01-08', projectName:'DY2025118-TCL小蓝屏P7U', account:'梁介测评', kukerId:'5dca9c52000000001000062', quotePrice:18000, coopType:'视频笔记', rebateRate:35, rebateAttr:'西西里', deduction:0, isRebate:'是', payments:[{amount:6300, date:'2026-02-12', method:'银行转账', note:''}], institution:'', note:'回收完成'},
+    {id:13, seq:13, medium:'金苗', month:'1月', orderDate:'2026-01-08', projectName:'DY2025118-TCL小蓝屏P7U', account:'一大韩三小韩', kukerId:'56a30aa384edb024b0006920', quotePrice:5200, coopType:'视频笔记', rebateRate:35, rebateAttr:'西西里', deduction:518.5, isRebate:'是', payments:[{amount:1301.5, date:'2026-02-14', method:'支付宝', note:''}], institution:'', note:'回收完成'},
+    {id:14, seq:14, medium:'金苗', month:'1月', orderDate:'2026-01-08', projectName:'DY2025118-TCL小蓝屏P7U', account:'张张测评', kukerId:'633db6fc0000000019020698', quotePrice:8000, coopType:'视频笔记', rebateRate:40, rebateAttr:'达人星球', deduction:0, isRebate:'是', payments:[], institution:'', note:''},
+    {id:15, seq:15, medium:'李品', month:'1月', orderDate:'2026-01-16', projectName:'DY2025099-梦百合特斯拉-YY', account:'℃YY', kukerId:'5a4ff55f11be107d89f6b415', quotePrice:1200, coopType:'图文笔记', rebateRate:35, rebateAttr:'个人', deduction:0, isRebate:'是', payments:[{amount:420, date:'2026-02-18', method:'微信转账', note:''}], institution:'', note:'回收完成'},
+    {id:16, seq:16, medium:'李品', month:'1月', orderDate:'2026-01-16', projectName:'DY2025116创维旺季产品站外营销', account:'左柚', kukerId:'5bac476fd29d8007ee1dd', quotePrice:2500, coopType:'图文笔记', rebateRate:35, rebateAttr:'个人', deduction:0, isRebate:'是', payments:[], institution:'', note:''},
+    {id:17, seq:17, medium:'金苗', month:'1月', orderDate:'2026-01-12', projectName:'DY2025116创维旺季产品站外营销', account:'阿杜装修日记', kukerId:'5e646d2600000000101cfa0', quotePrice:2000, coopType:'图文笔记', rebateRate:35, rebateAttr:'高端', deduction:0, isRebate:'是', payments:[{amount:700, date:'2026-02-06', method:'微信转账', note:''}], institution:'', note:'回收完成'},
+    {id:18, seq:18, medium:'金苗', month:'1月', orderDate:'2026-01-18', projectName:'DY2025109-大气星河', account:'筱筱拿', kukerId:'5fe0a9a90000000b00c60392e', quotePrice:18400, coopType:'视频笔记', rebateRate:35, rebateAttr:'个人', deduction:299, isRebate:'是', payments:[{amount:3000, date:'2026-02-22', method:'银行转账', note:'部分'}], institution:'', note:''},
+    {id:19, seq:19, medium:'李品', month:'1月', orderDate:'2026-01-20', projectName:'DY2025109-大气星河', account:'lululu', kukerId:'5876ca8f50c4b4145fb378e', quotePrice:13000, coopType:'视频笔记', rebateRate:35, rebateAttr:'个人', deduction:608.75, isRebate:'是', payments:[{amount:3941.25, date:'2026-02-25', method:'支付宝', note:''}], institution:'', note:'回收完成'},
+    {id:20, seq:20, medium:'李品', month:'1月', orderDate:'2026-01-20', projectName:'DY2025118-TCL小蓝屏P7U', account:'矿世奇璞', kukerId:'5c8cc8150000000012036a16', quotePrice:16800, coopType:'视频笔记', rebateRate:30, rebateAttr:'个人', deduction:0, isRebate:'是', payments:[{amount:5040, date:'2026-03-01', method:'银行转账', note:''}], institution:'', note:'回收完成'},
+  ],
+  proj2: [
+    {id:101, seq:1, medium:'金苗', month:'1月', orderDate:'2026-01-05', projectName:'DY2026001海信E8Q洗烘一体机', account:'阿东家居测评', kukerId:'65e6e3c0000500b6bd', quotePrice:3000, coopType:'图文笔记', rebateRate:40, rebateAttr:'达人星球', deduction:0, isRebate:'是', payments:[{amount:1200, date:'2026-02-01', method:'微信转账', note:''}], institution:'', note:'回收完成'},
+    {id:102, seq:2, medium:'金苗', month:'1月', orderDate:'2026-01-05', projectName:'DY2026001海信E8Q洗烘一体机', account:'哥哥装家电', kukerId:'651ac18200000002402e2c3', quotePrice:3000, coopType:'图文笔记', rebateRate:40, rebateAttr:'达人星球', deduction:0, isRebate:'是', payments:[{amount:1200, date:'2026-02-01', method:'微信转账', note:''}], institution:'', note:'回收完成'},
+    {id:103, seq:3, medium:'李品', month:'1月', orderDate:'2026-01-08', projectName:'DY2026001海信E8Q洗烘一体机', account:'小白苏装修红宝书', kukerId:'5f60789d0000000010020l1', quotePrice:4800, coopType:'图文笔记', rebateRate:40, rebateAttr:'个人', deduction:0, isRebate:'是', payments:[], institution:'', note:''},
+    {id:104, seq:4, medium:'李品', month:'1月', orderDate:'2026-01-10', projectName:'DY2026001海信E80洗烘一体机', account:'安然美好日记', kukerId:'5e7789090000000001050le', quotePrice:5000, coopType:'图文笔记', rebateRate:40, rebateAttr:'达人星球', deduction:0, isRebate:'是', payments:[{amount:1000, date:'2026-02-08', method:'支付宝', note:''}], institution:'', note:''},
+  ],
+  proj3: [
+    {id:201, seq:1, medium:'莉莉', month:'1月', orderDate:'2026-01-06', projectName:'DY2026001-海信E80洗烘一体机', account:'今天想吃猪猪饼子嗎', kukerId:'5764db3590c4b43078b0155e', quotePrice:7500, coopType:'图文笔记', rebateRate:35, rebateAttr:'个人', deduction:0, isRebate:'是', payments:[], institution:'', note:''},
+    {id:202, seq:2, medium:'莉莉', month:'1月', orderDate:'2026-01-06', projectName:'DY2026001-海信E80洗烘一体机', account:'漠漠橘子家', kukerId:'f7948000000000d20497', quotePrice:7480, coopType:'图文笔记', rebateRate:35, rebateAttr:'个人', deduction:0, isRebate:'是', payments:[{amount:1300, date:'2026-02-05', method:'微信转账', note:''}], institution:'', note:''},
+  ]
+};
+
+// ── App state ──────────────────────────────────────
+let db = {};
+let curProj = 'proj1';
+let curFilter = 'all';
+let sortKey = 'seq';
+let sortDir = 1;
+let editingId = null;
+
+function clone(x) { return JSON.parse(JSON.stringify(x)); }
+function rows() { return db[curProj] || []; }
+
+// ── Computed ──────────────────────────────────────
+function actualRebate(r) {
+  const base = r.quotePrice * r.rebateRate / 100;
+  return Math.max(0, base - (r.deduction||0));
+}
+function quotePriceWithFee(r) { return r.quotePrice * 1.1; }
+function rebateBase(r)   { return r.quotePrice * r.rebateRate / 100; }
+function collected(r)    { return (r.payments||[]).reduce((s,p)=>s+p.amount,0); }
+function remaining(r)    { return Math.max(0, actualRebate(r) - collected(r)); }
+function pct(r)          { const a = actualRebate(r); return a>0 ? Math.min(100, collected(r)/a*100) : 0; }
+function status(r)       { const p = pct(r); return p<=0 ? 'pending' : p>=100 ? 'full' : 'partial'; }
+
+// ── Format ──────────────────────────────────────
+function fmt(n) { return '¥'+Number(n).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmtR(n) { return n>0 ? '¥'+Number(n).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—'; }
+
+// ── Stats ──────────────────────────────────────
+function renderStats() {
+  const list = rows();
+  const totalRebate    = list.reduce((s,r)=>s+actualRebate(r),0);
+  const totalCollected = list.reduce((s,r)=>s+collected(r),0);
+  const totalRemaining = list.reduce((s,r)=>s+remaining(r),0);
+  const fullCnt    = list.filter(r=>status(r)==='full').length;
+  const pendingCnt = list.filter(r=>status(r)==='pending').length;
+  const overallPct = totalRebate>0 ? (totalCollected/totalRebate*100).toFixed(1) : 0;
+
+  document.getElementById('statsRow').innerHTML = `
+    <div class="stat-card"><div class="stat-label">达人总数</div><div class="stat-value c-text">${list.length}</div><div class="stat-sub">本项目合作</div></div>
+    <div class="stat-card"><div class="stat-label">实际返点总额</div><div class="stat-value c-amber">${fmt(totalRebate)}</div><div class="stat-sub">扣除抵扣后</div></div>
+    <div class="stat-card"><div class="stat-label">已收回金额</div><div class="stat-value c-green">${fmt(totalCollected)}</div><div class="stat-sub">收回率 ${overallPct}%</div></div>
+    <div class="stat-card"><div class="stat-label">待收余额</div><div class="stat-value c-red">${fmt(totalRemaining)}</div><div class="stat-sub">${pendingCnt} 人未付款</div></div>
+    <div class="stat-card"><div class="stat-label">已全额收回</div><div class="stat-value c-green">${fullCnt}</div><div class="stat-sub">占总数 ${list.length>0?(fullCnt/list.length*100).toFixed(0):0}%</div></div>
+    <div class="stat-card"><div class="stat-label">是否返点待确认</div><div class="stat-value c-accent">${list.filter(r=>!r.isRebate).length}</div><div class="stat-sub">未填写是否返点</div></div>
+  `;
+}
+
+// ── Sort ──────────────────────────────────────
+function sort(key) {
+  document.querySelectorAll('thead th').forEach(th=>th.classList.remove('sort-asc','sort-desc'));
+  sortDir = sortKey===key ? -sortDir : 1;
+  sortKey = key;
+  const ths = document.querySelectorAll('thead th');
+  const keyIdx = {seq:0,medium:1,month:2,orderDate:3,projectName:4,account:5,kukerId:6,quotePrice:7,quotePriceWithFee:8,coopType:9,rebateRate:10,rebateAmount:11,rebateAttr:12,deduction:13,actualRebate:14,isRebate:15,collected:16,status:18,institution:19};
+  if (keyIdx[key]!==undefined) ths[keyIdx[key]].classList.add(sortDir===1?'sort-asc':'sort-desc');
+  render();
+}
+
+function getSV(r, k) {
+  switch(k) {
+    case 'seq': return r.seq;
+    case 'medium': return r.medium||'';
+    case 'month': return parseInt(r.month)||0;
+    case 'orderDate': return r.orderDate||'';
+    case 'projectName': return r.projectName||'';
+    case 'account': return r.account||'';
+    case 'kukerId': return r.kukerId||'';
+    case 'quotePrice': return r.quotePrice||0;
+    case 'quotePriceWithFee': return quotePriceWithFee(r);
+    case 'coopType': return r.coopType||'';
+    case 'rebateRate': return r.rebateRate||0;
+    case 'rebateAmount': return rebateBase(r);
+    case 'rebateAttr': return r.rebateAttr||'';
+    case 'deduction': return r.deduction||0;
+    case 'actualRebate': return actualRebate(r);
+    case 'isRebate': return r.isRebate||'';
+    case 'collected': return collected(r);
+    case 'status': return status(r);
+    case 'institution': return r.institution||'';
+    default: return 0;
+  }
+}
+
+// ── Status helpers ──────────────────────────────────────
+function statusBadge(r) {
+  const s = status(r);
+  const cls = s==='full' ? 'badge-green' : s==='partial' ? 'badge-amber' : 'badge-red';
+  const dot = s==='full' ? 'dot-green' : s==='partial' ? 'dot-amber' : 'dot-red';
+  const label = s==='full' ? '已全额收回' : s==='partial' ? '部分收回' : '未收款';
+  return `<span class="badge ${cls}"><span class="dot ${dot}"></span>${label}</span>`;
+}
+
+function progBar(r) {
+  const p = pct(r);
+  const col = p>=100 ? 'var(--green)' : p>0 ? 'var(--amber)' : '#e0e4ef';
+  return `<div class="prog-wrap"><div class="prog-bar"><div class="prog-fill" style="width:${p}%;background:${col}"></div></div><span class="prog-pct">${p.toFixed(0)}%</span></div>`;
+}
+
+function isRebadge(v) {
+  if (v==='是') return `<span class="badge badge-green">是</span>`;
+  if (v==='否') return `<span class="badge badge-red">否</span>`;
+  return `<span class="badge badge-gray">待确认</span>`;
+}
+
+function coopTypeBadge(v) {
+  return v==='视频笔记'
+    ? `<span class="badge badge-purple">视频笔记</span>`
+    : `<span class="badge badge-blue">图文笔记</span>`;
+}
+
+function attrBadge(v) {
+  const map = {'科收自行回收':'badge-green','个人':'badge-blue','达人星球':'badge-purple','西西里':'badge-amber','高端':'badge-red'};
+  return `<span class="badge ${map[v]||'badge-gray'}">${v||'—'}</span>`;
+}
+
+// ── Render ──────────────────────────────────────
+function render() {
+  const q      = (document.getElementById('searchInput').value||'').toLowerCase();
+  const month  = document.getElementById('monthFilter').value;
+  const type   = document.getElementById('typeFilter').value;
+  const attr   = document.getElementById('attrFilter').value;
+
+  let list = rows().filter(r => {
+    const ms = !q || r.account.toLowerCase().includes(q) || (r.projectName||'').toLowerCase().includes(q) || (r.kukerId||'').toLowerCase().includes(q);
+    const mm = !month || r.month===month;
+    const mt = !type  || r.coopType===type;
+    const ma = !attr  || r.rebateAttr===attr;
+    const mf = curFilter==='all' || status(r)===curFilter;
+    return ms && mm && mt && ma && mf;
+  });
+
+  list.sort((a,b)=>{
+    const va=getSV(a,sortKey), vb=getSV(b,sortKey);
+    if (typeof va==='string') return va.localeCompare(vb,'zh')*sortDir;
+    return (va-vb)*sortDir;
+  });
+
+  document.getElementById('rowCount').textContent = `显示 ${list.length} / ${rows().length} 条`;
+
+  const tbody = document.getElementById('tbody');
+  const empty = document.getElementById('emptyState');
+
+  if (list.length===0) { tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+
+  const colAmt = r => remaining(r)<=0
+    ? `<span class="mono" style="color:var(--green)">—</span>`
+    : `<span class="mono" style="color:var(--red)">${fmt(remaining(r))}</span>`;
+
+  tbody.innerHTML = list.map(r => `
+    <tr>
+      <td style="color:var(--text3);text-align:center">${r.seq}</td>
+      <td><span class="badge badge-gray">${r.medium||'—'}</span></td>
+      <td style="color:var(--text2)">${r.month||'—'}</td>
+      <td style="color:var(--text3)">${r.orderDate||'—'}</td>
+      <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;color:var(--text2)" title="${r.projectName||''}">${r.projectName||'—'}</td>
+      <td><div class="inf-cell"><span class="inf-name">${r.account||'—'}</span></div></td>
+      <td style="color:var(--text3);font-size:11px">${r.kukerId||'—'}</td>
+      <td class="mono">${fmt(r.quotePrice)}</td>
+      <td class="mono" style="color:var(--text2)">${fmt(quotePriceWithFee(r))}</td>
+      <td>${coopTypeBadge(r.coopType)}</td>
+      <td class="mono" style="color:var(--amber);font-weight:600">${r.rebateRate}%</td>
+      <td class="mono" style="color:var(--amber)">${fmt(rebateBase(r))}</td>
+      <td>${attrBadge(r.rebateAttr)}</td>
+      <td class="mono" style="color:var(--text3)">${r.deduction>0 ? fmt(r.deduction) : '—'}</td>
+      <td class="mono" style="color:var(--amber);font-weight:600">${fmt(actualRebate(r))}</td>
+      <td>${isRebadge(r.isRebate)}</td>
+      <td class="mono" style="color:var(--green)">${collected(r)>0 ? fmt(collected(r)) : '—'}</td>
+      <td>${progBar(r)}</td>
+      <td>${statusBadge(r)}</td>
+      <td style="color:var(--text3);font-size:11px">${r.institution||'—'}</td>
+      <td class="note-col" title="${r.note||''}">${r.note||'—'}</td>
+      <td>
+        <button class="btn btn-ghost btn-sm" onclick="openDetail(${r.id})" style="color:var(--accent)">收款</button>
+        <button class="btn btn-ghost btn-sm" onclick="del(${r.id})" style="color:var(--red);margin-left:2px">删除</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ── Detail modal ──────────────────────────────────────
+function openDetail(id) {
+  editingId = id;
+  const r = rows().find(x=>x.id===id); if(!r) return;
+  document.getElementById('d-name').textContent = r.account||'—';
+  document.getElementById('d-sub').textContent  = `${r.projectName||''} · ${r.month||''} · ${r.rebateAttr||''}`;
+  document.getElementById('d-rebate').textContent    = fmt(actualRebate(r));
+  document.getElementById('d-collected').textContent = fmt(collected(r));
+  document.getElementById('d-remaining').textContent = fmt(remaining(r));
+  document.getElementById('d-pct').textContent       = pct(r).toFixed(1)+'%';
+
+  const pays = (r.payments||[]).slice().reverse();
+  document.getElementById('payList').innerHTML = pays.length===0
+    ? '<div class="no-pay">暂无收款记录</div>'
+    : pays.map(p=>`
+        <div class="pay-item">
+          <div class="pay-item-l">
+            <div class="pay-icon">✓</div>
+            <div>
+              <div class="pay-method">${p.method} · <span class="pay-date">${p.date}</span></div>
+              ${p.note ? `<div class="pay-note">${p.note}</div>` : ''}
+            </div>
+          </div>
+          <span class="pay-amount">+${fmt(p.amount)}</span>
+        </div>`).join('');
+
+  document.getElementById('payDate').value   = new Date().toISOString().slice(0,10);
+  document.getElementById('payAmt').value    = '';
+  document.getElementById('payNote').value   = '';
+  document.getElementById('payMethod').value = '微信转账';
+  openModal('detailOverlay');
+}
+
+function addPayment() {
+  const amt    = parseFloat(document.getElementById('payAmt').value);
+  const date   = document.getElementById('payDate').value;
+  const method = document.getElementById('payMethod').value;
+  const note   = document.getElementById('payNote').value.trim();
+
+  if (!amt || amt<=0) { toast('请输入有效收款金额','e'); return; }
+  if (!date)          { toast('请选择收款日期','e'); return; }
+
+  const idx = db[curProj].findIndex(x=>x.id===editingId);
+  if (idx<0) return;
+  const r = db[curProj][idx];
+  const rem = remaining(r);
+  if (amt > rem+0.01) { toast(`超出待收余额 ${fmt(rem)}`,'e'); return; }
+
+  db[curProj][idx].payments.push({amount:amt, date, method, note});
+  save(); renderStats(); render();
+  closeModal('detailOverlay');
+  toast(`已登记收款 ${fmt(amt)}`,'s');
+}
+
+// ── Add modal ──────────────────────────────────────
+function openAddModal() {
+  ['a-account','a-project','a-kukerId','a-quote','a-rate','a-institution','a-note'].forEach(id=>{ document.getElementById(id).value=''; });
+  document.getElementById('a-deduction').value='0';
+  document.getElementById('a-orderDate').value=new Date().toISOString().slice(0,10);
+  openModal('addOverlay');
+}
+
+function submitAdd() {
+  const account  = document.getElementById('a-account').value.trim();
+  const quote    = parseFloat(document.getElementById('a-quote').value);
+  const rate     = parseFloat(document.getElementById('a-rate').value);
+  if (!account)           { toast('请填写达人账号','e'); return; }
+  if (!quote||quote<=0)   { toast('请输入有效报价','e'); return; }
+  if (isNaN(rate)||rate<0){ toast('请输入有效返点比例','e'); return; }
+
+  const ids  = rows().map(r=>r.id);
+  const newId = ids.length>0 ? Math.max(...ids)+1 : 1;
+  const seqs  = rows().map(r=>r.seq);
+  const newSeq= seqs.length>0 ? Math.max(...seqs)+1 : 1;
+
+  if (!db[curProj]) db[curProj]=[];
+  db[curProj].push({
+    id: newId, seq: newSeq,
+    medium:    document.getElementById('a-medium').value,
+    month:     document.getElementById('a-month').value,
+    orderDate: document.getElementById('a-orderDate').value,
+    projectName: document.getElementById('a-project').value.trim(),
+    account,
+    kukerId:   document.getElementById('a-kukerId').value.trim(),
+    quotePrice: quote,
+    coopType:  document.getElementById('a-coopType').value,
+    rebateRate: rate,
+    rebateAttr: document.getElementById('a-attr').value,
+    deduction:  parseFloat(document.getElementById('a-deduction').value)||0,
+    isRebate:   document.getElementById('a-isRebate').value,
+    institution: document.getElementById('a-institution').value.trim(),
+    note:       document.getElementById('a-note').value.trim(),
+    payments: []
+  });
+  save(); renderStats(); render();
+  closeModal('addOverlay');
+  toast(`「${account}」已添加`,'s');
+}
+
+// ── Delete ──────────────────────────────────────
+function del(id) {
+  const r = rows().find(x=>x.id===id); if(!r) return;
+  if (!confirm(`确认删除「${r.account}」及所有收款记录？`)) return;
+  db[curProj] = db[curProj].filter(x=>x.id!==id);
+  save(); renderStats(); render();
+  toast(`已删除「${r.account}」`,'s');
+}
+
+// ── Project switch ──────────────────────────────────────
+function switchProject() {
+  curProj = document.getElementById('projSel').value;
+  if (!db[curProj]) db[curProj]=[];
+  renderStats(); render();
+}
+
+// ── Export ──────────────────────────────────────
+function exportCSV() {
+  const list = rows();
+  const hdrs = ['序号','媒介','订单月','订单日期','项目名称','达人账号','库客ID','达人报价','含服务费报价(+10%)','合作类型','返点比例(%)','返点金额','返点归属','安装快递抵扣','实际返点金额','是否返点','已收金额','待收余额','收回进度(%)','回收状态','挂靠机构','备注'];
+  const rows2 = list.map(r=>[
+    r.seq, r.medium, r.month, r.orderDate, r.projectName, r.account, r.kukerId,
+    r.quotePrice, quotePriceWithFee(r).toFixed(2), r.coopType, r.rebateRate,
+    rebateBase(r).toFixed(2), r.rebateAttr, r.deduction||0, actualRebate(r).toFixed(2),
+    r.isRebate||'待确认', collected(r).toFixed(2), remaining(r).toFixed(2),
+    pct(r).toFixed(1), {pending:'未收款',partial:'部分收回',full:'已全额收回'}[status(r)],
+    r.institution||'', r.note||''
+  ]);
+  const csv = [hdrs,...rows2].map(row=>row.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href=url; a.download=`返点收回_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+  URL.revokeObjectURL(url);
+  toast('CSV已导出','s');
+}
+
+// ── Filter pills ──────────────────────────────────────
+function setFilter(val, el) {
+  curFilter = val;
+  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  render();
+}
+
+// ── Modal helpers ──────────────────────────────────────
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function closeBg(e,id)  { if(e.target.id===id) closeModal(id); }
+
+// ── Toast ──────────────────────────────────────
+function toast(msg, type='s') {
+  const box = document.getElementById('toastBox');
+  const el  = document.createElement('div');
+  el.className=`toast ${type}`;
+  el.innerHTML = (type==='s'?'✓ ':'✕ ')+msg;
+  box.appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(()=>el.remove(),300); }, 2600);
+}
+
+// ── Init ──────────────────────────────────────
+(async function init() {
+  try {
+    await ensureAuth();
+    await migrateLocalData();
+    renderStats(); render();
+    startPolling();
+  } catch (e) {
+    if (e.message !== 'pending_auth') {
+      toast('初始化失败: ' + (e.message || '未知错误'), 'e');
+      setSyncStatus('error');
+    }
+  }
+})();
+
+// ═══════════════════════════════════════════════
+// EXCEL IMPORT
+// ═══════════════════════════════════════════════
+
+// System fields definition
+const SYSTEM_FIELDS = [
+  { key: 'seq',          label: '序号',            required: false },
+  { key: 'medium',       label: '媒介',            required: false },
+  { key: 'month',        label: '订单完成月',       required: false },
+  { key: 'orderDate',    label: '订单完成时间',     required: false },
+  { key: 'projectName',  label: '项目名称',         required: false },
+  { key: 'account',      label: '达人账号',         required: true  },
+  { key: 'kukerId',      label: '库客ID',           required: false },
+  { key: 'quotePrice',   label: '达人报价',         required: true  },
+  { key: 'coopType',     label: '合作类型',         required: false },
+  { key: 'rebateRate',   label: '返点比例(%)',      required: true  },
+  { key: 'rebateAttr',   label: '返点归属',         required: false },
+  { key: 'deduction',    label: '安装/快递费抵扣',  required: false },
+  { key: 'isRebate',     label: '是否返点',         required: false },
+  { key: 'institution',  label: '挂靠机构',         required: false },
+  { key: 'note',         label: '备注',             required: false },
+  { key: '__ignore__',   label: '— 忽略此列 —',    required: false },
+];
+
+// Keyword-based auto-mapping
+const AUTO_MAP_RULES = [
+  { keys: ['达人账号','账号','kol账号','博主','达人名','达人昵称'],   field: 'account'       },
+  { keys: ['媒介','负责人','对接人'],                                   field: 'medium'        },
+  { keys: ['订单完成月','月份','完成月'],                               field: 'month'         },
+  { keys: ['订单完成时间','完成时间','日期','时间','date'],              field: 'orderDate'     },
+  { keys: ['项目名称','项目','project'],                                field: 'projectName'   },
+  { keys: ['库客id','kukeid','koc id','平台id'],                        field: 'kukerId'       },
+  { keys: ['达人报价','报价','合作金额','费用','博主报价'],              field: 'quotePrice'    },
+  { keys: ['合作类型','类型','笔记类型'],                               field: 'coopType'      },
+  { keys: ['返点比例','比例','返点%','rebate%','rebate rate'],          field: 'rebateRate'    },
+  { keys: ['返点归属','归属'],                                          field: 'rebateAttr'    },
+  { keys: ['安装','快递','抵扣','deduction'],                           field: 'deduction'     },
+  { keys: ['是否返点','返点确认'],                                      field: 'isRebate'      },
+  { keys: ['挂靠','机构','挂靠机构'],                                   field: 'institution'   },
+  { keys: ['备注','remark','note'],                                     field: 'note'          },
+  { keys: ['序号','no','#'],                                            field: 'seq'           },
+];
+
+let importState = {
+  step: 1,
+  rawRows: [],       // raw array-of-objects from SheetJS
+  headers: [],       // column names from file
+  colMap: {},        // { colName: systemFieldKey }
+  mode: 'append',
+  parsedRows: [],    // after mapping applied
+};
+
+function openImportModal() {
+  resetImport();
+  openModal('importOverlay');
+}
+
+function closeImport() {
+  closeModal('importOverlay');
+  resetImport();
+}
+
+function resetImport() {
+  importState = { step:1, rawRows:[], headers:[], colMap:{}, mode:'append', parsedRows:[] };
+  document.getElementById('fileInput').value = '';
+  goStep(1);
+}
+
+// ── Drag & Drop ──
+function onDragOver(e)  { e.preventDefault(); document.getElementById('dropZone').classList.add('drag-over'); }
+function onDragLeave(e) { document.getElementById('dropZone').classList.remove('drag-over'); }
+function onDrop(e) {
+  e.preventDefault();
+  document.getElementById('dropZone').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) processFile(file);
+}
+function handleFile(e) { const f = e.target.files[0]; if(f) processFile(f); }
+
+// ── Parse file with SheetJS ──
+function processFile(file) {
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (!['xlsx','xls','csv'].includes(ext)) { toast('仅支持 .xlsx .xls .csv 格式','e'); return; }
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const wb = XLSX.read(data, { type:'array', cellDates:true });
+      const sheetName = wb.SheetNames[0];
+      const ws = wb.Sheets[sheetName];
+
+      // Convert to array of arrays for header detection
+      const aoa = XLSX.utils.sheet_to_json(ws, { header:1, defval:'' });
+      if (aoa.length < 2) { toast('文件内容为空或只有表头','e'); return; }
+
+      // Find header row (first row with content)
+      let headerRowIdx = 0;
+      for (let i = 0; i < Math.min(5, aoa.length); i++) {
+        if (aoa[i].filter(c => String(c).trim()).length > 2) { headerRowIdx = i; break; }
+      }
+
+      const rawHeaders = aoa[headerRowIdx].map(h => String(h).trim());
+      const dataRows = aoa.slice(headerRowIdx + 1).filter(row => row.some(c => String(c).trim()));
+
+      importState.headers = rawHeaders;
+      importState.rawRows = dataRows.map(row => {
+        const obj = {};
+        rawHeaders.forEach((h, i) => { obj[h] = row[i] !== undefined ? row[i] : ''; });
+        return obj;
+      });
+
+      // Auto-map columns
+      importState.colMap = {};
+      rawHeaders.forEach(h => {
+        const hl = h.toLowerCase().replace(/\s/g,'');
+        let matched = '__ignore__';
+        for (const rule of AUTO_MAP_RULES) {
+          if (rule.keys.some(k => hl.includes(k.toLowerCase().replace(/\s/g,'')))) {
+            matched = rule.field; break;
+          }
+        }
+        importState.colMap[h] = matched;
+      });
+
+      goStep(2);
+    } catch(err) {
+      console.error(err);
+      toast('文件解析失败，请检查格式','e');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// ── Step navigation ──
+function goStep(n) {
+  importState.step = n;
+  ['importStep1','importStep2','importStep3'].forEach((id,i) => {
+    document.getElementById(id).style.display = (i+1===n) ? 'block' : 'none';
+  });
+  // Step indicators
+  ['step1-ind','step2-ind','step3-ind'].forEach((id,i) => {
+    const el = document.getElementById(id);
+    el.className = 'step' + (i+1===n ? ' active' : i+1<n ? ' done' : '');
+    el.querySelector('.step-num').textContent = i+1<n ? '✓' : String(i+1);
+  });
+
+  if (n===2) renderColMap();
+  if (n===3) renderPreview();
+}
+
+// ── Column mapping UI ──
+function renderColMap() {
+  const sample = importState.rawRows[0] || {};
+  const opts = SYSTEM_FIELDS.map(f =>
+    `<option value="${f.key}">${f.label}${f.required?' *':''}</option>`
+  ).join('');
+
+  document.getElementById('previewInfo').innerHTML = `
+    <div class="import-chip">文件列数 <strong>${importState.headers.length}</strong></div>
+    <div class="import-chip">数据行数 <strong>${importState.rawRows.length}</strong></div>
+    <div class="import-chip">工作表 <strong>第1张</strong></div>
+  `;
+
+  document.getElementById('colMapBody').innerHTML = importState.headers.map(h => {
+    const val = importState.colMap[h] || '__ignore__';
+    const preview = String(sample[h] ?? '').slice(0,30);
+    return `<tr>
+      <td style="font-weight:500;color:var(--text)">${h}</td>
+      <td class="preview-val">${preview || '—'}</td>
+      <td>
+        <select onchange="importState.colMap['${h.replace(/'/g,"\\'")}'] = this.value">
+          ${SYSTEM_FIELDS.map(f =>
+            `<option value="${f.key}" ${val===f.key?'selected':''}>${f.label}${f.required?' *':''}</option>`
+          ).join('')}
+        </select>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Import mode ──
+function setImportMode(mode) {
+  importState.mode = mode;
+  ['modeAppend','modeReplace','modeSkipDup'].forEach(id => document.getElementById(id).classList.remove('active'));
+  const map = {append:'modeAppend', replace:'modeReplace', skipdup:'modeSkipDup'};
+  document.getElementById(map[mode]).classList.add('active');
+}
+
+// ── Parse rows using mapping ──
+function applyMapping() {
+  return importState.rawRows.map((rawRow, i) => {
+    const obj = { id: Date.now() + i, payments: [] };
+    Object.entries(importState.colMap).forEach(([colName, fieldKey]) => {
+      if (fieldKey === '__ignore__') return;
+      let val = rawRow[colName];
+      // Type coerce
+      if (['quotePrice','rebateRate','deduction'].includes(fieldKey)) {
+        val = parseFloat(String(val).replace(/[^\d.-]/g,'')) || 0;
+      }
+      if (fieldKey === 'seq') val = parseInt(val) || (i+1);
+      if (fieldKey === 'orderDate' && val instanceof Date) {
+        val = val.toISOString().slice(0,10);
+      } else if (fieldKey === 'orderDate') {
+        // try parse string date
+        const d = new Date(val);
+        val = isNaN(d) ? String(val) : d.toISOString().slice(0,10);
+      }
+      obj[fieldKey] = val !== undefined && val !== null ? val : '';
+    });
+    // Defaults
+    if (!obj.seq) obj.seq = i+1;
+    if (!obj.month && obj.orderDate) {
+      const m = parseInt((obj.orderDate||'').split('-')[1]);
+      if (m) obj.month = m+'月';
+    }
+    return obj;
+  }).filter(r => r.account); // must have account
+}
+
+// ── Preview step ──
+function renderPreview() {
+  importState.parsedRows = applyMapping();
+  const rows = importState.parsedRows;
+  const existing = db[curProj] || [];
+
+  let toImport = rows;
+  if (importState.mode === 'skipdup') {
+    const existAccounts = new Set(existing.map(r=>r.account));
+    toImport = rows.filter(r => !existAccounts.has(r.account));
+  }
+
+  document.getElementById('importSummary').innerHTML = `
+    <div class="import-chip">解析行数 <strong>${rows.length}</strong></div>
+    <div class="import-chip">将导入 <strong style="color:var(--green)">${toImport.length}</strong> 行</div>
+    ${importState.mode==='skipdup' ? `<div class="import-chip">跳过重复 <strong>${rows.length-toImport.length}</strong> 行</div>` : ''}
+    ${importState.mode==='replace' ? `<div class="import-chip" style="color:var(--red)">将清空现有 ${existing.length} 行</div>` : ''}
+  `;
+
+  // Preview table (first 5 rows)
+  const preview5 = toImport.slice(0,5);
+  const shownFields = ['seq','medium','month','account','quotePrice','rebateRate','rebateAttr','isRebate'];
+  const fieldLabels = {seq:'序号',medium:'媒介',month:'月',account:'达人账号',quotePrice:'报价',rebateRate:'返点%',rebateAttr:'归属',isRebate:'是否返点'};
+
+  const thead = `<thead><tr>${shownFields.map(f=>`<th>${fieldLabels[f]||f}</th>`).join('')}</tr></thead>`;
+  const tbody2 = `<tbody>${preview5.map(r=>`<tr>${shownFields.map(f=>`<td>${r[f]||'—'}</td>`).join('')}</tr>`).join('')}</tbody>`;
+  document.getElementById('previewTable').innerHTML = thead+tbody2;
+}
+
+// ── Confirm import ──
+function confirmImport() {
+  const rows = importState.parsedRows;
+  if (!rows.length) { toast('没有可导入的数据','e'); return; }
+
+  if (!db[curProj]) db[curProj] = [];
+
+  if (importState.mode === 'replace') {
+    db[curProj] = [];
+  }
+
+  let toAdd = rows;
+  if (importState.mode === 'skipdup') {
+    const existAccounts = new Set(db[curProj].map(r=>r.account));
+    toAdd = rows.filter(r => !existAccounts.has(r.account));
+  }
+
+  // Assign fresh IDs and seqs
+  const maxId  = db[curProj].length ? Math.max(...db[curProj].map(r=>r.id))  : 0;
+  const maxSeq = db[curProj].length ? Math.max(...db[curProj].map(r=>r.seq)) : 0;
+  toAdd.forEach((r, i) => {
+    r.id  = maxId  + i + 1;
+    r.seq = maxSeq + i + 1;
+    if (!r.payments) r.payments = [];
+  });
+
+  db[curProj].push(...toAdd);
+  save(); renderStats(); render();
+  closeImport();
+  toast(`成功导入 ${toAdd.length} 条达人数据`, 's');
+}
+
+// ── Download template ──
+function downloadTemplate() {
+  const hdrs = ['媒介','订单完成月','订单完成时间','项目名称','达人账号','库客ID','达人报价','合作类型','返点比例(%)','返点归属','安装/快递费抵扣','是否返点','挂靠机构','备注'];
+  const example = ['金苗','1月','2026-01-15','DY2026004科收26Q1小红书种草','示例达人账号','66a8f61c000000000b033474','5000','图文笔记','35','个人','0','是','',''];
+  const ws = XLSX.utils.aoa_to_sheet([hdrs, example]);
+  ws['!cols'] = hdrs.map(() => ({ wch: 18 }));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, '返点数据模板');
+  XLSX.writeFile(wb, '返点导入模板.xlsx');
+  toast('模板已下载', 's');
+}
+</script>
+</body>
+</html>
