@@ -2,7 +2,8 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <title>26年项目内部返点管理</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
@@ -205,7 +206,8 @@ body {
   box-shadow: var(--shadow);
 }
 
-.table-scroll { overflow-x: auto; }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; max-height: calc(100vh - 320px); }
+.table-scroll thead th { position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 var(--border); }
 
 table {
   width: 100%;
@@ -391,10 +393,179 @@ tbody td { padding: 10px 12px; vertical-align: middle; }
 @keyframes toastIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
 
 /* ── Responsive ── */
+.mobile-menu-btn,
+.mobile-list,
+.fab { display: none; }
+
 @media(max-width:900px) {
   .stats-row { grid-template-columns: repeat(3,1fr); }
   .header, .toolbar, .table-container { margin-left: 14px; margin-right: 14px; padding-left: 14px; padding-right: 14px; }
   .stats-row { padding: 14px; }
+}
+
+@media(max-width:768px) {
+  body { font-size: 14px; padding-bottom: env(safe-area-inset-bottom, 0); }
+
+  .header {
+    height: auto;
+    min-height: 52px;
+    padding: 10px 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+  .header-left { flex: 1; min-width: 0; }
+  .header-title { font-size: 15px; }
+  .header-sub { display: none; }
+  .logo { width: 32px; height: 32px; font-size: 15px; }
+
+  .mobile-menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    background: var(--surface);
+    font-size: 20px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .mobile-menu-btn.open { background: var(--accent-lt); border-color: var(--accent); color: var(--accent); }
+
+  .header-right {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding-top: 4px;
+  }
+  .header-right.open { display: flex; }
+  .header-right .btn,
+  .header-right .project-sel,
+  .header-right .sync-status { width: 100%; justify-content: center; min-height: 44px; }
+
+  .stats-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    padding: 10px 12px 8px;
+    margin: 0;
+  }
+  .stat-card { padding: 10px 12px; }
+  .stat-value { font-size: 17px; }
+
+  .toolbar {
+    padding: 0 12px 10px;
+    margin: 0;
+    gap: 8px;
+  }
+  .search-wrap { max-width: none; min-width: 0; flex: 1 1 100%; }
+  .pills {
+    flex: 1 1 100%;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2px;
+  }
+  .pill { flex-shrink: 0; min-height: 36px; padding: 8px 14px; }
+  .filter-select { flex: 1 1 calc(50% - 4px); min-width: 0; min-height: 40px; font-size: 14px; }
+  .row-count { margin-left: 0; width: 100%; text-align: right; }
+
+  .table-container { display: none; }
+
+  .mobile-list {
+    display: block;
+    margin: 0 12px 80px;
+  }
+  .mobile-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+  }
+  .mobile-card-hd {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .mobile-card-name { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.3; }
+  .mobile-card-proj { font-size: 12px; color: var(--text3); margin-top: 4px; line-height: 1.4; }
+  .mobile-card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .mobile-card-item {
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 8px 10px;
+  }
+  .mobile-card-item.full { grid-column: 1 / -1; }
+  .mobile-card-lbl { font-size: 10px; color: var(--text3); margin-bottom: 3px; }
+  .mobile-card-val { font-size: 13px; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+  .mobile-card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .mobile-card-actions .btn { flex: 1; justify-content: center; min-height: 44px; font-size: 14px; }
+
+  .fab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    right: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0));
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: none;
+    background: var(--accent);
+    color: #fff;
+    font-size: 28px;
+    font-weight: 300;
+    box-shadow: 0 4px 16px rgba(79,110,247,.45);
+    cursor: pointer;
+    z-index: 90;
+  }
+  .fab:active { transform: scale(.96); }
+
+  .modal {
+    width: 100%;
+    max-width: 100%;
+    max-height: 92vh;
+    border-radius: 16px 16px 0 0;
+    margin-top: auto;
+  }
+  .overlay { align-items: flex-end; padding: 0; }
+  .overlay.open .modal { animation: slideUp .25s ease; }
+  @keyframes slideUp { from{opacity:0;transform:translateY(100%)} to{opacity:1;transform:translateY(0)} }
+  .modal-hd { padding: 18px 16px 14px; }
+  .modal-bd { padding: 16px; }
+  .form-row { grid-template-columns: 1fr; }
+  .info-grid-2 { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .form-col input, .form-col select, .form-col textarea { font-size: 16px; padding: 10px 12px; min-height: 44px; }
+  .form-actions { flex-direction: column-reverse; }
+  .form-actions .btn { width: 100%; justify-content: center; min-height: 44px; }
+
+  .import-mode-row { flex-direction: column; }
+  .import-drop-zone { padding: 28px 16px; }
+  .step-indicator { flex-wrap: wrap; gap: 4px; }
+  .step-sep { display: none; }
+
+  .toast-box { left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom, 0)); }
+  .auth-box { width: calc(100vw - 32px); max-width: 360px; padding: 24px 20px; }
+  .auth-box input { font-size: 16px; min-height: 44px; }
+
+  .empty-state { padding: 32px 16px; }
 }
 
 /* ── Scrollbar ── */
@@ -479,10 +650,72 @@ tbody td { padding: 10px 12px; vertical-align: middle; }
   margin-bottom: 12px; outline: none;
 }
 .auth-box input:focus { border-color: var(--accent); }
+
+.readonly-badge {
+  display: inline-flex; align-items: center;
+  padding: 4px 10px; border-radius: var(--radius);
+  background: var(--amber-lt); color: #b45309;
+  font-size: 11px; font-weight: 600;
+  border: 1px solid #fcd34d;
+}
+.readonly-mode .write-only { display: none !important; }
+.readonly-mode .fab { display: none !important; }
+
+.loading-overlay {
+  position: fixed; inset: 0; background: var(--bg);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 10000; gap: 12px;
+}
+.loading-overlay.hide { display: none; }
+.loading-spinner {
+  width: 36px; height: 36px; border: 3px solid var(--border);
+  border-top-color: var(--accent); border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-size: 13px; color: var(--text2); }
+
+.settlement-box {
+  margin: 16px 0; padding: 14px; border: 1px solid var(--border);
+  border-radius: var(--radius); background: var(--header-bg);
+}
+.settlement-box .section-title { margin-bottom: 10px; }
+.settle-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.badge-overdue { background: var(--red-lt); color: var(--red); border: 1px solid #fecaca; }
+.sms-hint { font-size: 11px; color: var(--text3); margin-top: 8px; }
+.pill-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+
+.btn-icon {
+  width: 36px; height: 36px; padding: 0; justify-content: center;
+  border-radius: var(--radius); flex-shrink: 0;
+}
+.toolbar-extra { display: contents; }
+.filter-toggle { display: none; }
+
+@media(max-width:768px) {
+  .filter-toggle {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 8px 14px; border-radius: var(--radius);
+    border: 1px solid var(--border2); background: var(--surface);
+    font-size: 13px; font-family: inherit; cursor: pointer; color: var(--text2);
+  }
+  .filter-toggle.open { background: var(--accent-lt); border-color: var(--accent); color: var(--accent); }
+  .toolbar-extra { display: none; width: 100%; gap: 8px; flex-wrap: wrap; }
+  .toolbar-extra.open { display: flex; }
+  .table-scroll { max-height: none; }
+  .mobile-card { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .mobile-card:active { transform: scale(.99); }
+}
+body { -webkit-tap-highlight-color: transparent; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">正在加载数据…</div>
+</div>
 
 <!-- Header -->
 <div class="header">
@@ -493,19 +726,22 @@ tbody td { padding: 10px 12px; vertical-align: middle; }
       <div class="header-sub">达人合作 · 返点收回追踪系统</div>
     </div>
   </div>
-  <div class="header-right">
-    <span class="sync-status synced" id="syncStatus" title="多人共享 · 自动同步">
+  <button type="button" class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileMenu()" aria-label="菜单">☰</button>
+  <div class="header-right" id="headerActions">
+    <span class="sync-status synced" id="syncStatus" title="点击刷新" onclick="manualRefresh()" style="cursor:pointer">
       <span class="sync-dot"></span>
       <span id="syncText">已同步</span>
     </span>
+    <span class="readonly-badge" id="readonlyBadge" style="display:none">👁 只读模式</span>
     <select class="project-sel" id="projSel" onchange="switchProject()">
       <option value="proj1">2026年春季美妆专项</option>
       <option value="proj2">年货节生活好物</option>
       <option value="proj3">618美食探店计划</option>
     </select>
-    <button class="btn btn-ghost" onclick="openImportModal()">📥 导入Excel</button>
+    <button class="btn btn-ghost write-only" onclick="openImportModal()">📥 导入Excel</button>
     <button class="btn btn-ghost" onclick="exportCSV()">📤 导出CSV</button>
-    <button class="btn btn-primary" onclick="openAddModal()">＋ 新增达人</button>
+    <button class="btn btn-primary write-only" onclick="openAddModal()">＋ 新增达人</button>
+    <button class="btn btn-ghost" onclick="logout()" style="color:var(--text3)">退出登录</button>
   </div>
 </div>
 
@@ -516,13 +752,16 @@ tbody td { padding: 10px 12px; vertical-align: middle; }
 <div class="toolbar">
   <div class="search-wrap">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-    <input type="text" id="searchInput" placeholder="搜索达人账号、项目名称…" oninput="render()">
+    <input type="text" id="searchInput" placeholder="搜索达人账号、项目名称…" oninput="debouncedRender()">
   </div>
+  <button type="button" class="filter-toggle" id="filterToggle" onclick="toggleFilters()">筛选 ▾</button>
+  <div class="toolbar-extra" id="toolbarExtra">
   <div class="pills">
     <button class="pill active" onclick="setFilter('all',this)">全部</button>
     <button class="pill" onclick="setFilter('pending',this)">未收款</button>
     <button class="pill" onclick="setFilter('partial',this)">部分收回</button>
-    <button class="pill" onclick="setFilter('full',this)">已全额</button>
+    <button class="pill" onclick="setFilter('overdue',this)">返点逾期</button>
+    <button class="pill" onclick="setFilter('contract_pending',this)">待签合同</button>
   </div>
   <select class="filter-select" id="monthFilter" onchange="render()">
     <option value="">全部月份</option>
@@ -553,6 +792,7 @@ tbody td { padding: 10px 12px; vertical-align: middle; }
     <option value="高端">高端</option>
   </select>
   <span class="row-count" id="rowCount"></span>
+  </div>
 </div>
 
 <!-- Table -->
@@ -595,6 +835,11 @@ tbody td { padding: 10px 12px; vertical-align: middle; }
   </div>
 </div>
 
+<!-- Mobile card list -->
+<div class="mobile-list" id="mobileList"></div>
+
+<button type="button" class="fab write-only" onclick="openAddModal()" aria-label="新增达人">＋</button>
+
 <!-- Detail Modal -->
 <div class="overlay" id="detailOverlay" onclick="closeBg(event,'detailOverlay')">
   <div class="modal">
@@ -625,12 +870,59 @@ tbody td { padding: 10px 12px; vertical-align: middle; }
         </div>
       </div>
 
+      <div class="settlement-box write-only" id="settlementBox">
+        <div class="section-title">结算与联系（达人短信）</div>
+        <div class="form-row">
+          <div class="form-col"><label>联系人</label>
+            <input type="text" id="d-contactName" placeholder="达人称呼">
+          </div>
+          <div class="form-col"><label>手机号</label>
+            <input type="tel" id="d-contactPhone" placeholder="13800138000" maxlength="11">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-col"><label>合同状态</label>
+            <select id="d-contractStatus">
+              <option value="none">未开始</option>
+              <option value="pending">待签署</option>
+              <option value="signed">已签署</option>
+            </select>
+          </div>
+          <div class="form-col"><label>合同编号</label>
+            <input type="text" id="d-contractNo" placeholder="可选">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-col"><label>开票状态</label>
+            <select id="d-invoiceStatus">
+              <option value="none">未开始</option>
+              <option value="pending">待开票</option>
+              <option value="issued">已开票</option>
+            </select>
+          </div>
+          <div class="form-col"><label>计划回款日</label>
+            <input type="date" id="d-planCollectDate">
+          </div>
+        </div>
+        <div class="settle-actions">
+          <button type="button" class="btn btn-primary btn-sm" onclick="saveSettlement()">保存结算信息</button>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="sendSmsRemind('contract')">📱 催签合同</button>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="sendSmsRemind('rebate_due')">📱 催返点</button>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="sendSmsRemind('rebate_overdue')">📱 逾期提醒</button>
+        </div>
+        <div class="sms-hint" id="d-smsHint">短信发给达人（阿里云），需配置 Render 环境变量；同一达人 7 天内限发 1 条自动提醒。</div>
+      </div>
+      <div class="settlement-box readonly-only" id="settlementReadonly" style="display:none">
+        <div class="section-title">结算与联系</div>
+        <div id="d-settleReadonlyText" style="font-size:12px;color:var(--text2);line-height:1.8"></div>
+      </div>
+
       <div class="pay-log">
         <div class="section-title">收款记录</div>
         <div id="payList"></div>
       </div>
 
-      <div class="add-pay-box">
+      <div class="add-pay-box write-only">
         <div class="add-pay-title">📥 登记收款</div>
         <div class="form-row">
           <div class="form-col">
@@ -693,11 +985,20 @@ tbody td { padding: 10px 12px; vertical-align: middle; }
           </div>
         </div>
         <div class="form-row">
+          <div class="form-col"><label>达人账号 *</label>
+            <input type="text" id="a-account" placeholder="账号名称">
+          </div>
+          <div class="form-col"><label>联系人 / 手机号</label>
+            <input type="text" id="a-contactName" placeholder="称呼" style="margin-bottom:6px">
+            <input type="tel" id="a-contactPhone" placeholder="13800138000" maxlength="11">
+          </div>
+        </div>
+        <div class="form-row">
           <div class="form-col"><label>订单完成时间</label>
             <input type="date" id="a-orderDate">
           </div>
-          <div class="form-col"><label>达人账号 *</label>
-            <input type="text" id="a-account" placeholder="账号名称">
+          <div class="form-col"><label>计划回款日</label>
+            <input type="date" id="a-planCollectDate">
           </div>
         </div>
         <div class="form-row">
@@ -859,7 +1160,7 @@ tbody td { padding: 10px 12px; vertical-align: middle; }
 <div class="auth-overlay" id="authOverlay" style="display:none">
   <div class="auth-box">
     <h2>🔐 输入访问密钥</h2>
-    <p>此工具为团队内部使用，请输入管理员提供的密钥以访问共享数据。</p>
+    <p>团队密钥可编辑数据；只读密钥仅供查看（适合老板）。</p>
     <input type="password" id="authKeyInput" placeholder="访问密钥" onkeydown="if(event.key==='Enter')submitAuth()">
     <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="submitAuth()">进入系统</button>
   </div>
@@ -869,14 +1170,59 @@ tbody td { padding: 10px 12px; vertical-align: middle; }
 // ── Cloud sync ──────────────────────────────────────
 const KEY = 'rebate_26_v3';
 const ACCESS_KEY_STORAGE = 'rebate_access_key';
+let userRole = 'write';
 let dbVersion = 0;
 let saveTimer = null;
 let pendingSave = false;
 let pollTimer = null;
+let pollDelay = 1200;
 let authRequired = false;
+let lastRemoteVersion = 0;
+let pollingStarted = false;
+let renderTimer = null;
+let lastSyncAt = 0;
+
+function showLoading() { document.getElementById('loadingOverlay')?.classList.remove('hide'); }
+function hideLoading() { document.getElementById('loadingOverlay')?.classList.add('hide'); }
+
+function debouncedRender() {
+  clearTimeout(renderTimer);
+  renderTimer = setTimeout(render, 250);
+}
+
+function toggleFilters() {
+  const el = document.getElementById('toolbarExtra');
+  const btn = document.getElementById('filterToggle');
+  el.classList.toggle('open');
+  btn.classList.toggle('open');
+  btn.textContent = el.classList.contains('open') ? '筛选 ▴' : '筛选 ▾';
+}
+
+async function manualRefresh() {
+  setSyncStatus('saving', '刷新中…');
+  await pullFromServer({ silent: false, notify: false });
+  toast('已刷新', 's');
+}
+
+function logout() {
+  sessionStorage.removeItem(ACCESS_KEY_STORAGE);
+  userRole = 'write';
+  clearTimeout(pollTimer);
+  pollingStarted = false;
+  showAuth();
+  document.getElementById('headerActions')?.classList.remove('open');
+}
 
 function getAccessKey() {
   return sessionStorage.getItem(ACCESS_KEY_STORAGE) || '';
+}
+
+function isReadonly() { return userRole === 'read'; }
+
+function applyReadonlyUI() {
+  document.body.classList.toggle('readonly-mode', isReadonly());
+  const badge = document.getElementById('readonlyBadge');
+  if (badge) badge.style.display = isReadonly() ? 'inline-flex' : 'none';
 }
 
 function authHeaders() {
@@ -888,6 +1234,7 @@ function setSyncStatus(state, text) {
   const el = document.getElementById('syncStatus');
   const txt = document.getElementById('syncText');
   el.className = 'sync-status ' + state;
+  if (state === 'synced') lastSyncAt = Date.now();
   if (text) txt.textContent = text;
   else if (state === 'synced') txt.textContent = '已同步';
   else if (state === 'saving') txt.textContent = '保存中…';
@@ -911,10 +1258,12 @@ async function submitAuth() {
   try {
     await loadFromServer();
     hideAuth();
-    await migrateLocalData();
+    hideLoading();
+    applyReadonlyUI();
+    if (!isReadonly()) await migrateLocalData();
     renderStats(); render();
     startPolling();
-    toast('验证成功，已连接共享数据', 's');
+    toast(isReadonly() ? '已进入只读模式，仅可查看' : '验证成功，已连接共享数据', 's');
   } catch (e) {
     sessionStorage.removeItem(ACCESS_KEY_STORAGE);
     toast(e.message || '密钥无效', 'e');
@@ -931,9 +1280,11 @@ async function ensureAuth() {
   if (getAccessKey()) {
     try {
       await loadFromServer();
+      applyReadonlyUI();
       return;
     } catch (_) {
       sessionStorage.removeItem(ACCESS_KEY_STORAGE);
+      userRole = 'write';
     }
   }
   showAuth();
@@ -950,10 +1301,42 @@ async function loadFromServer() {
   }
   if (!res.ok) throw new Error('加载数据失败');
   const json = await res.json();
+  userRole = json.role || 'write';
   db = json.data && Object.keys(json.data).length ? json.data : clone(defaultData);
   dbVersion = json.version;
+  lastRemoteVersion = json.version;
   if (!db[curProj]) db[curProj] = [];
   setSyncStatus('synced');
+}
+
+async function pullFromServer(options = {}) {
+  const { silent = false, notify = true } = options;
+  if (document.getElementById('authOverlay').style.display === 'flex') return false;
+  try {
+    const res = await fetch('/api/data', { headers: authHeaders(), cache: 'no-store' });
+    if (!res.ok) return false;
+    const json = await res.json();
+    if (json.version > dbVersion) {
+      db = json.data;
+      dbVersion = json.version;
+      if (json.role) userRole = json.role;
+      if (!db[curProj]) db[curProj] = [];
+      applyReadonlyUI();
+      renderStats(); render();
+      setSyncStatus('synced');
+      if (notify && json.version > lastRemoteVersion && document.hasFocus()) {
+        toast('已同步其他人的更新', 's');
+      }
+      lastRemoteVersion = json.version;
+      return true;
+    }
+    lastRemoteVersion = json.version;
+    if (!silent) setSyncStatus('synced');
+    return false;
+  } catch (_) {
+    setSyncStatus('offline');
+    return false;
+  }
 }
 
 async function flushSave() {
@@ -968,14 +1351,21 @@ async function flushSave() {
     });
     if (res.status === 401) {
       sessionStorage.removeItem(ACCESS_KEY_STORAGE);
+      userRole = 'write';
       showAuth();
       setSyncStatus('error');
+      return;
+    }
+    if (res.status === 403) {
+      setSyncStatus('synced');
+      toast('只读模式，无法保存修改', 'e');
       return;
     }
     if (res.status === 409) {
       const conflict = await res.json();
       db = conflict.data || db;
       dbVersion = conflict.version;
+      lastRemoteVersion = conflict.version;
       if (!db[curProj]) db[curProj] = [];
       renderStats(); render();
       setSyncStatus('synced');
@@ -985,6 +1375,7 @@ async function flushSave() {
     if (!res.ok) throw new Error('save failed');
     const json = await res.json();
     dbVersion = json.version;
+    lastRemoteVersion = json.version;
     setSyncStatus('synced');
   } catch (e) {
     setSyncStatus('error');
@@ -993,34 +1384,45 @@ async function flushSave() {
 }
 
 function save() {
+  if (isReadonly()) return;
   pendingSave = true;
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(flushSave, 400);
+  saveTimer = setTimeout(flushSave, 120);
+}
+
+async function saveAndSync() {
+  if (isReadonly()) return;
+  pendingSave = true;
+  clearTimeout(saveTimer);
+  await flushSave();
+}
+
+function schedulePoll() {
+  clearTimeout(pollTimer);
+  pollDelay = document.hidden ? 4000 : 1200;
+  pollTimer = setTimeout(async () => {
+    if (!pendingSave) await pullFromServer({ silent: true, notify: true });
+    schedulePoll();
+  }, pollDelay);
 }
 
 function startPolling() {
-  if (pollTimer) clearInterval(pollTimer);
-  pollTimer = setInterval(async () => {
-    if (pendingSave || document.getElementById('authOverlay').style.display === 'flex') return;
-    try {
-      const res = await fetch('/api/data', { headers: authHeaders() });
-      if (!res.ok) return;
-      const json = await res.json();
-      if (json.version > dbVersion) {
-        db = json.data;
-        dbVersion = json.version;
-        if (!db[curProj]) db[curProj] = [];
-        renderStats(); render();
-        setSyncStatus('synced');
-        toast('已同步其他人的更新', 's');
-      }
-    } catch (_) {
-      setSyncStatus('offline');
-    }
-  }, 4000);
+  clearTimeout(pollTimer);
+  lastRemoteVersion = dbVersion;
+  schedulePoll();
+  if (pollingStarted) return;
+  pollingStarted = true;
+  document.addEventListener('visibilitychange', () => {
+    pollDelay = document.hidden ? 4000 : 1200;
+    if (!document.hidden && !pendingSave) pullFromServer({ silent: false, notify: true });
+  });
+  window.addEventListener('focus', () => {
+    if (!pendingSave) pullFromServer({ silent: false, notify: true });
+  });
 }
 
 async function migrateLocalData() {
+  if (isReadonly()) return;
   try {
     const local = localStorage.getItem(KEY);
     if (!local) return;
@@ -1038,41 +1440,8 @@ async function migrateLocalData() {
   } catch (_) {}
 }
 
-// ── Sample data matching the Excel structure ─────
-const defaultData = {
-  proj1: [
-    {id:1,  seq:1,  medium:'莉莉', month:'1月', orderDate:'2026-01-15', projectName:'DY2026004科收26Q1小红书种草', account:'每日品牌料普', kukerId:'66a8f61c000000000b033474', quotePrice:1400, coopType:'图文笔记', rebateRate:35, rebateAttr:'科收自行回收', deduction:0, isRebate:'', payments:[], institution:'', note:''},
-    {id:2,  seq:2,  medium:'莉莉', month:'1月', orderDate:'2026-01-15', projectName:'DY2026004科收26Q1小红书种草', account:'完女Amy的美妆日记', kukerId:'5d2fb4ae000000000011001aae', quotePrice:5000, coopType:'图文笔记', rebateRate:40, rebateAttr:'科收自行回收', deduction:0, isRebate:'', payments:[], institution:'', note:''},
-    {id:3,  seq:3,  medium:'金苗', month:'1月', orderDate:'2026-01-12', projectName:'DY2025116创维旺季产品站外营销', account:'克同学生家', kukerId:'59e8b3df11be106ebbec575b', quotePrice:2000, coopType:'图文笔记', rebateRate:35, rebateAttr:'科收自行回收', deduction:0, isRebate:'是', payments:[{amount:700, date:'2026-02-01', method:'微信转账', note:''}], institution:'', note:'回收完成'},
-    {id:4,  seq:4,  medium:'金苗', month:'1月', orderDate:'2026-01-12', projectName:'DY2025116创维旺季产品站外营销', account:'Ryan的装修日记', kukerId:'162b07a5000000000700661b', quotePrice:1500, coopType:'图文笔记', rebateRate:35, rebateAttr:'高端', deduction:0, isRebate:'是', payments:[{amount:525, date:'2026-02-05', method:'支付宝', note:''}], institution:'', note:'回收完成'},
-    {id:5,  seq:5,  medium:'李品', month:'1月', orderDate:'2026-01-18', projectName:'DY2025116创维旺季产品站外营销', account:'大美集市91', kukerId:'5ca75130000000000001e4', quotePrice:8500, coopType:'图文笔记', rebateRate:35, rebateAttr:'个人', deduction:0, isRebate:'是', payments:[{amount:1500, date:'2026-02-10', method:'银行转账', note:'第一笔'}], institution:'', note:''},
-    {id:6,  seq:6,  medium:'李品', month:'1月', orderDate:'2026-01-20', projectName:'DY2025099-梦百合特斯拉-古姆', account:'古姆学长', kukerId:'5e4b62d100000000100568', quotePrice:7000, coopType:'图文笔记', rebateRate:30, rebateAttr:'个人', deduction:0, isRebate:'是', payments:[], institution:'', note:''},
-    {id:7,  seq:7,  medium:'金苗', month:'1月', orderDate:'2026-01-10', projectName:'DY2025116创维旺季产品站外营销', account:'珑瑞家居测评', kukerId:'65ffe7c500000000c00d2ca', quotePrice:9300, coopType:'图文笔记', rebateRate:35, rebateAttr:'个人', deduction:0, isRebate:'', payments:[], institution:'', note:''},
-    {id:8,  seq:8,  medium:'金苗', month:'1月', orderDate:'2026-01-10', projectName:'DY2025116创维旺季产品站外营销', account:'烛燃慢生记', kukerId:'67b4b6520000000000012423', quotePrice:1500, coopType:'图文笔记', rebateRate:35, rebateAttr:'高端', deduction:0, isRebate:'是', payments:[{amount:525, date:'2026-02-03', method:'微信转账', note:''}], institution:'', note:'回收完成'},
-    {id:9,  seq:9,  medium:'李品', month:'1月', orderDate:'2026-01-22', projectName:'DY2024fb65000000000012', account:'夏夏Orange', kukerId:'16280000000000004736', quotePrice:14800, coopType:'图文笔记', rebateRate:35, rebateAttr:'个人', deduction:442.41, isRebate:'是', payments:[{amount:4000, date:'2026-02-15', method:'银行转账', note:''},{amount:293.59, date:'2026-03-01', method:'微信转账', note:'尾款'}], institution:'', note:'回收完成'},
-    {id:10, seq:10, medium:'李品', month:'1月', orderDate:'2026-01-25', projectName:'DY2025064老板电冰箱金大全', account:'金大全Home(硬装中)', kukerId:'616e67fa000000001000ae53', quotePrice:22000, coopType:'视频笔记', rebateRate:35, rebateAttr:'个人', deduction:0, isRebate:'是', payments:[{amount:3000, date:'2026-02-20', method:'支付宝', note:''}], institution:'', note:''},
-    {id:11, seq:11, medium:'金苗', month:'1月', orderDate:'2026-01-08', projectName:'DY2025118-TCL小蓝屏P7U', account:'江半不是江半', kukerId:'8667f2db000000000700b7a', quotePrice:7500, coopType:'视频笔记', rebateRate:35, rebateAttr:'个人', deduction:1049, isRebate:'是', payments:[{amount:1576, date:'2026-02-08', method:'微信转账', note:''}], institution:'', note:'回收完成'},
-    {id:12, seq:12, medium:'金苗', month:'1月', orderDate:'2026-01-08', projectName:'DY2025118-TCL小蓝屏P7U', account:'梁介测评', kukerId:'5dca9c52000000001000062', quotePrice:18000, coopType:'视频笔记', rebateRate:35, rebateAttr:'西西里', deduction:0, isRebate:'是', payments:[{amount:6300, date:'2026-02-12', method:'银行转账', note:''}], institution:'', note:'回收完成'},
-    {id:13, seq:13, medium:'金苗', month:'1月', orderDate:'2026-01-08', projectName:'DY2025118-TCL小蓝屏P7U', account:'一大韩三小韩', kukerId:'56a30aa384edb024b0006920', quotePrice:5200, coopType:'视频笔记', rebateRate:35, rebateAttr:'西西里', deduction:518.5, isRebate:'是', payments:[{amount:1301.5, date:'2026-02-14', method:'支付宝', note:''}], institution:'', note:'回收完成'},
-    {id:14, seq:14, medium:'金苗', month:'1月', orderDate:'2026-01-08', projectName:'DY2025118-TCL小蓝屏P7U', account:'张张测评', kukerId:'633db6fc0000000019020698', quotePrice:8000, coopType:'视频笔记', rebateRate:40, rebateAttr:'达人星球', deduction:0, isRebate:'是', payments:[], institution:'', note:''},
-    {id:15, seq:15, medium:'李品', month:'1月', orderDate:'2026-01-16', projectName:'DY2025099-梦百合特斯拉-YY', account:'℃YY', kukerId:'5a4ff55f11be107d89f6b415', quotePrice:1200, coopType:'图文笔记', rebateRate:35, rebateAttr:'个人', deduction:0, isRebate:'是', payments:[{amount:420, date:'2026-02-18', method:'微信转账', note:''}], institution:'', note:'回收完成'},
-    {id:16, seq:16, medium:'李品', month:'1月', orderDate:'2026-01-16', projectName:'DY2025116创维旺季产品站外营销', account:'左柚', kukerId:'5bac476fd29d8007ee1dd', quotePrice:2500, coopType:'图文笔记', rebateRate:35, rebateAttr:'个人', deduction:0, isRebate:'是', payments:[], institution:'', note:''},
-    {id:17, seq:17, medium:'金苗', month:'1月', orderDate:'2026-01-12', projectName:'DY2025116创维旺季产品站外营销', account:'阿杜装修日记', kukerId:'5e646d2600000000101cfa0', quotePrice:2000, coopType:'图文笔记', rebateRate:35, rebateAttr:'高端', deduction:0, isRebate:'是', payments:[{amount:700, date:'2026-02-06', method:'微信转账', note:''}], institution:'', note:'回收完成'},
-    {id:18, seq:18, medium:'金苗', month:'1月', orderDate:'2026-01-18', projectName:'DY2025109-大气星河', account:'筱筱拿', kukerId:'5fe0a9a90000000b00c60392e', quotePrice:18400, coopType:'视频笔记', rebateRate:35, rebateAttr:'个人', deduction:299, isRebate:'是', payments:[{amount:3000, date:'2026-02-22', method:'银行转账', note:'部分'}], institution:'', note:''},
-    {id:19, seq:19, medium:'李品', month:'1月', orderDate:'2026-01-20', projectName:'DY2025109-大气星河', account:'lululu', kukerId:'5876ca8f50c4b4145fb378e', quotePrice:13000, coopType:'视频笔记', rebateRate:35, rebateAttr:'个人', deduction:608.75, isRebate:'是', payments:[{amount:3941.25, date:'2026-02-25', method:'支付宝', note:''}], institution:'', note:'回收完成'},
-    {id:20, seq:20, medium:'李品', month:'1月', orderDate:'2026-01-20', projectName:'DY2025118-TCL小蓝屏P7U', account:'矿世奇璞', kukerId:'5c8cc8150000000012036a16', quotePrice:16800, coopType:'视频笔记', rebateRate:30, rebateAttr:'个人', deduction:0, isRebate:'是', payments:[{amount:5040, date:'2026-03-01', method:'银行转账', note:''}], institution:'', note:'回收完成'},
-  ],
-  proj2: [
-    {id:101, seq:1, medium:'金苗', month:'1月', orderDate:'2026-01-05', projectName:'DY2026001海信E8Q洗烘一体机', account:'阿东家居测评', kukerId:'65e6e3c0000500b6bd', quotePrice:3000, coopType:'图文笔记', rebateRate:40, rebateAttr:'达人星球', deduction:0, isRebate:'是', payments:[{amount:1200, date:'2026-02-01', method:'微信转账', note:''}], institution:'', note:'回收完成'},
-    {id:102, seq:2, medium:'金苗', month:'1月', orderDate:'2026-01-05', projectName:'DY2026001海信E8Q洗烘一体机', account:'哥哥装家电', kukerId:'651ac18200000002402e2c3', quotePrice:3000, coopType:'图文笔记', rebateRate:40, rebateAttr:'达人星球', deduction:0, isRebate:'是', payments:[{amount:1200, date:'2026-02-01', method:'微信转账', note:''}], institution:'', note:'回收完成'},
-    {id:103, seq:3, medium:'李品', month:'1月', orderDate:'2026-01-08', projectName:'DY2026001海信E8Q洗烘一体机', account:'小白苏装修红宝书', kukerId:'5f60789d0000000010020l1', quotePrice:4800, coopType:'图文笔记', rebateRate:40, rebateAttr:'个人', deduction:0, isRebate:'是', payments:[], institution:'', note:''},
-    {id:104, seq:4, medium:'李品', month:'1月', orderDate:'2026-01-10', projectName:'DY2026001海信E80洗烘一体机', account:'安然美好日记', kukerId:'5e7789090000000001050le', quotePrice:5000, coopType:'图文笔记', rebateRate:40, rebateAttr:'达人星球', deduction:0, isRebate:'是', payments:[{amount:1000, date:'2026-02-08', method:'支付宝', note:''}], institution:'', note:''},
-  ],
-  proj3: [
-    {id:201, seq:1, medium:'莉莉', month:'1月', orderDate:'2026-01-06', projectName:'DY2026001-海信E80洗烘一体机', account:'今天想吃猪猪饼子嗎', kukerId:'5764db3590c4b43078b0155e', quotePrice:7500, coopType:'图文笔记', rebateRate:35, rebateAttr:'个人', deduction:0, isRebate:'是', payments:[], institution:'', note:''},
-    {id:202, seq:2, medium:'莉莉', month:'1月', orderDate:'2026-01-06', projectName:'DY2026001-海信E80洗烘一体机', account:'漠漠橘子家', kukerId:'f7948000000000d20497', quotePrice:7480, coopType:'图文笔记', rebateRate:35, rebateAttr:'个人', deduction:0, isRebate:'是', payments:[{amount:1300, date:'2026-02-05', method:'微信转账', note:''}], institution:'', note:''},
-  ]
-};
+// ── Default empty projects ─────
+const defaultData = { proj1: [], proj2: [], proj3: [] };
 
 // ── App state ──────────────────────────────────────
 let db = {};
@@ -1097,6 +1466,39 @@ function remaining(r)    { return Math.max(0, actualRebate(r) - collected(r)); }
 function pct(r)          { const a = actualRebate(r); return a>0 ? Math.min(100, collected(r)/a*100) : 0; }
 function status(r)       { const p = pct(r); return p<=0 ? 'pending' : p>=100 ? 'full' : 'partial'; }
 
+const CONTRACT_LABELS = { none: '未开始', pending: '待签署', signed: '已签署' };
+const INVOICE_LABELS  = { none: '未开始', pending: '待开票', issued: '已开票' };
+
+function isOverdue(r) {
+  if (remaining(r) <= 0) return false;
+  if (!r.planCollectDate) return false;
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const due = new Date(r.planCollectDate + 'T00:00:00');
+  return due < today;
+}
+
+function isContractPending(r) {
+  if (remaining(r) <= 0) return false;
+  const s = r.contractStatus || 'none';
+  return s === 'none' || s === 'pending';
+}
+
+function canSendSms(r) {
+  if (!r.contactPhone) return false;
+  if (r.smsEnabled === false) return false;
+  if (!r.lastSmsAt) return true;
+  const days = (Date.now() - new Date(r.lastSmsAt).getTime()) / 86400000;
+  return days >= 7;
+}
+
+function settlementSummary(r) {
+  const c = CONTRACT_LABELS[r.contractStatus || 'none'];
+  const i = INVOICE_LABELS[r.invoiceStatus || 'none'];
+  const phone = r.contactPhone ? ` · ${r.contactPhone}` : '';
+  const due = r.planCollectDate ? ` · 计划 ${r.planCollectDate}` : '';
+  return `${c} / ${i}${due}${phone}`;
+}
+
 // ── Format ──────────────────────────────────────
 function fmt(n) { return '¥'+Number(n).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 function fmtR(n) { return n>0 ? '¥'+Number(n).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—'; }
@@ -1107,8 +1509,9 @@ function renderStats() {
   const totalRebate    = list.reduce((s,r)=>s+actualRebate(r),0);
   const totalCollected = list.reduce((s,r)=>s+collected(r),0);
   const totalRemaining = list.reduce((s,r)=>s+remaining(r),0);
-  const fullCnt    = list.filter(r=>status(r)==='full').length;
   const pendingCnt = list.filter(r=>status(r)==='pending').length;
+  const overdueCnt = list.filter(r=>isOverdue(r)).length;
+  const contractCnt = list.filter(r=>isContractPending(r)).length;
   const overallPct = totalRebate>0 ? (totalCollected/totalRebate*100).toFixed(1) : 0;
 
   document.getElementById('statsRow').innerHTML = `
@@ -1116,8 +1519,8 @@ function renderStats() {
     <div class="stat-card"><div class="stat-label">实际返点总额</div><div class="stat-value c-amber">${fmt(totalRebate)}</div><div class="stat-sub">扣除抵扣后</div></div>
     <div class="stat-card"><div class="stat-label">已收回金额</div><div class="stat-value c-green">${fmt(totalCollected)}</div><div class="stat-sub">收回率 ${overallPct}%</div></div>
     <div class="stat-card"><div class="stat-label">待收余额</div><div class="stat-value c-red">${fmt(totalRemaining)}</div><div class="stat-sub">${pendingCnt} 人未付款</div></div>
-    <div class="stat-card"><div class="stat-label">已全额收回</div><div class="stat-value c-green">${fullCnt}</div><div class="stat-sub">占总数 ${list.length>0?(fullCnt/list.length*100).toFixed(0):0}%</div></div>
-    <div class="stat-card"><div class="stat-label">是否返点待确认</div><div class="stat-value c-accent">${list.filter(r=>!r.isRebate).length}</div><div class="stat-sub">未填写是否返点</div></div>
+    <div class="stat-card"><div class="stat-label">返点逾期</div><div class="stat-value c-red">${overdueCnt}</div><div class="stat-sub">已过计划回款日</div></div>
+    <div class="stat-card"><div class="stat-label">待签合同</div><div class="stat-value c-accent">${contractCnt}</div><div class="stat-sub">未签或未开始</div></div>
   `;
 }
 
@@ -1189,6 +1592,54 @@ function attrBadge(v) {
   return `<span class="badge ${map[v]||'badge-gray'}">${v||'—'}</span>`;
 }
 
+function toggleMobileMenu() {
+  document.getElementById('headerActions').classList.toggle('open');
+  document.getElementById('mobileMenuBtn').classList.toggle('open');
+}
+
+function renderMobileCards(list) {
+  const el = document.getElementById('mobileList');
+  if (!el) return;
+  if (list.length === 0) {
+    el.innerHTML = `<div class="empty-state"><div class="icon">🔍</div><p>暂无匹配数据</p><small>调整筛选条件试试</small></div>`;
+    return;
+  }
+  el.innerHTML = list.map(r => `
+    <div class="mobile-card" onclick="openDetail(${r.id})">
+      <div class="mobile-card-hd">
+        <div style="min-width:0;flex:1">
+          <div class="mobile-card-name">${r.account||'—'}</div>
+          <div class="mobile-card-proj">${r.projectName||'—'}</div>
+        </div>
+        ${statusBadge(r)}${isOverdue(r) ? ' <span class="badge badge-overdue">逾期</span>' : ''}
+      </div>
+      <div style="margin-bottom:10px">${progBar(r)}</div>
+      <div class="mobile-card-grid">
+        <div class="mobile-card-item">
+          <div class="mobile-card-lbl">实际返点</div>
+          <div class="mobile-card-val" style="color:var(--amber)">${fmt(actualRebate(r))}</div>
+        </div>
+        <div class="mobile-card-item">
+          <div class="mobile-card-lbl">待收余额</div>
+          <div class="mobile-card-val" style="color:${remaining(r)>0?'var(--red)':'var(--green)'}">${remaining(r)>0?fmt(remaining(r)):'已结清'}</div>
+        </div>
+        <div class="mobile-card-item">
+          <div class="mobile-card-lbl">已收 / 媒介</div>
+          <div class="mobile-card-val" style="color:var(--green);font-size:12px">${collected(r)>0?fmt(collected(r)):'—'} · ${r.medium||'—'}</div>
+        </div>
+        <div class="mobile-card-item">
+          <div class="mobile-card-lbl">返点比例</div>
+          <div class="mobile-card-val">${r.rebateRate||0}% ${attrBadge(r.rebateAttr)}</div>
+        </div>
+      </div>
+      <div class="mobile-card-actions" onclick="event.stopPropagation()">
+        <button type="button" class="btn btn-primary" onclick="openDetail(${r.id})">${isReadonly()?'查看详情':'登记收款'}</button>
+        ${isReadonly()?'':`<button type="button" class="btn btn-ghost write-only" onclick="del(${r.id})" style="color:var(--red)">删除</button>`}
+      </div>
+    </div>
+  `).join('');
+}
+
 // ── Render ──────────────────────────────────────
 function render() {
   const q      = (document.getElementById('searchInput').value||'').toLowerCase();
@@ -1201,7 +1652,9 @@ function render() {
     const mm = !month || r.month===month;
     const mt = !type  || r.coopType===type;
     const ma = !attr  || r.rebateAttr===attr;
-    const mf = curFilter==='all' || status(r)===curFilter;
+    const mf = curFilter==='all' || status(r)===curFilter
+      || (curFilter==='overdue' && isOverdue(r))
+      || (curFilter==='contract_pending' && isContractPending(r));
     return ms && mm && mt && ma && mf;
   });
 
@@ -1216,7 +1669,12 @@ function render() {
   const tbody = document.getElementById('tbody');
   const empty = document.getElementById('emptyState');
 
-  if (list.length===0) { tbody.innerHTML=''; empty.style.display='block'; return; }
+  if (list.length===0) {
+    tbody.innerHTML='';
+    empty.style.display='block';
+    renderMobileCards(list);
+    return;
+  }
   empty.style.display='none';
 
   const colAmt = r => remaining(r)<=0
@@ -1247,14 +1705,37 @@ function render() {
       <td style="color:var(--text3);font-size:11px">${r.institution||'—'}</td>
       <td class="note-col" title="${r.note||''}">${r.note||'—'}</td>
       <td>
-        <button class="btn btn-ghost btn-sm" onclick="openDetail(${r.id})" style="color:var(--accent)">收款</button>
-        <button class="btn btn-ghost btn-sm" onclick="del(${r.id})" style="color:var(--red);margin-left:2px">删除</button>
+        <button class="btn btn-ghost btn-sm" onclick="openDetail(${r.id})" style="color:var(--accent)">${isReadonly()?'查看':'收款'}</button>
+        ${isReadonly()?'':`<button class="btn btn-ghost btn-sm write-only" onclick="del(${r.id})" style="color:var(--red);margin-left:2px">删除</button>`}
       </td>
     </tr>
   `).join('');
+  renderMobileCards(list);
 }
 
 // ── Detail modal ──────────────────────────────────────
+function fillSettlementForm(r) {
+  const writeBox = document.getElementById('settlementBox');
+  const readBox = document.getElementById('settlementReadonly');
+  if (isReadonly()) {
+    if (writeBox) writeBox.style.display = 'none';
+    if (readBox) {
+      readBox.style.display = 'block';
+      document.getElementById('d-settleReadonlyText').innerHTML =
+        `联系人：${r.contactName || '—'}<br>手机：${r.contactPhone || '—'}<br>${settlementSummary(r)}`;
+    }
+    return;
+  }
+  if (writeBox) writeBox.style.display = 'block';
+  if (readBox) readBox.style.display = 'none';
+  document.getElementById('d-contactName').value = r.contactName || '';
+  document.getElementById('d-contactPhone').value = r.contactPhone || '';
+  document.getElementById('d-contractStatus').value = r.contractStatus || 'none';
+  document.getElementById('d-contractNo').value = r.contractNo || '';
+  document.getElementById('d-invoiceStatus').value = r.invoiceStatus || 'none';
+  document.getElementById('d-planCollectDate').value = r.planCollectDate || '';
+}
+
 function openDetail(id) {
   editingId = id;
   const r = rows().find(x=>x.id===id); if(!r) return;
@@ -1264,6 +1745,7 @@ function openDetail(id) {
   document.getElementById('d-collected').textContent = fmt(collected(r));
   document.getElementById('d-remaining').textContent = fmt(remaining(r));
   document.getElementById('d-pct').textContent       = pct(r).toFixed(1)+'%';
+  fillSettlementForm(r);
 
   const pays = (r.payments||[]).slice().reverse();
   document.getElementById('payList').innerHTML = pays.length===0
@@ -1287,7 +1769,66 @@ function openDetail(id) {
   openModal('detailOverlay');
 }
 
-function addPayment() {
+async function saveSettlement() {
+  if (isReadonly()) return;
+  const idx = db[curProj].findIndex(x => x.id === editingId);
+  if (idx < 0) return;
+  const r = db[curProj][idx];
+  r.contactName = document.getElementById('d-contactName').value.trim();
+  r.contactPhone = document.getElementById('d-contactPhone').value.trim().replace(/\D/g, '');
+  r.contractStatus = document.getElementById('d-contractStatus').value;
+  r.contractNo = document.getElementById('d-contractNo').value.trim();
+  r.invoiceStatus = document.getElementById('d-invoiceStatus').value;
+  r.planCollectDate = document.getElementById('d-planCollectDate').value;
+  await saveAndSync();
+  renderStats(); render();
+  toast('结算信息已保存', 's');
+}
+
+async function sendSmsRemind(type) {
+  if (isReadonly()) { toast('只读模式，无法发短信', 'e'); return; }
+  const idx = db[curProj].findIndex(x => x.id === editingId);
+  if (idx < 0) return;
+  const r = db[curProj][idx];
+  const phone = (document.getElementById('d-contactPhone').value || r.contactPhone || '').replace(/\D/g, '');
+  if (!phone) { toast('请先填写达人手机号', 'e'); return; }
+  if (!canSendSms(r)) { toast('7 天内已发过短信，请稍后再试', 'e'); return; }
+
+  const contactName = document.getElementById('d-contactName').value.trim() || r.contactName || r.account;
+  const payload = {
+    type,
+    phone,
+    contactName,
+    projectName: r.projectName || r.account,
+    amount: remaining(r).toFixed(2),
+    date: r.planCollectDate || '',
+    medium: r.medium || '对接媒介',
+  };
+
+  try {
+    setSyncStatus('saving', '发送短信…');
+    const res = await fetch('/api/sms/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      body: JSON.stringify(payload),
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || '发送失败');
+    r.contactPhone = phone;
+    r.contactName = contactName;
+    r.lastSmsAt = new Date().toISOString();
+    r.smsRemindCount = (r.smsRemindCount || 0) + 1;
+    await saveAndSync();
+    setSyncStatus('synced');
+    toast('短信已发送给达人', 's');
+  } catch (e) {
+    setSyncStatus('error');
+    toast(e.message || '短信发送失败', 'e');
+  }
+}
+
+async function addPayment() {
+  if (isReadonly()) { toast('只读模式，无法登记收款', 'e'); return; }
   const amt    = parseFloat(document.getElementById('payAmt').value);
   const date   = document.getElementById('payDate').value;
   const method = document.getElementById('payMethod').value;
@@ -1303,20 +1844,22 @@ function addPayment() {
   if (amt > rem+0.01) { toast(`超出待收余额 ${fmt(rem)}`,'e'); return; }
 
   db[curProj][idx].payments.push({amount:amt, date, method, note});
-  save(); renderStats(); render();
+  await saveAndSync(); renderStats(); render();
   closeModal('detailOverlay');
   toast(`已登记收款 ${fmt(amt)}`,'s');
 }
 
 // ── Add modal ──────────────────────────────────────
 function openAddModal() {
-  ['a-account','a-project','a-kukerId','a-quote','a-rate','a-institution','a-note'].forEach(id=>{ document.getElementById(id).value=''; });
+  if (isReadonly()) { toast('只读模式，无法新增', 'e'); return; }
+  ['a-account','a-project','a-kukerId','a-quote','a-rate','a-institution','a-note','a-contactName','a-contactPhone','a-planCollectDate'].forEach(id=>{ document.getElementById(id).value=''; });
   document.getElementById('a-deduction').value='0';
   document.getElementById('a-orderDate').value=new Date().toISOString().slice(0,10);
   openModal('addOverlay');
 }
 
-function submitAdd() {
+async function submitAdd() {
+  if (isReadonly()) return;
   const account  = document.getElementById('a-account').value.trim();
   const quote    = parseFloat(document.getElementById('a-quote').value);
   const rate     = parseFloat(document.getElementById('a-rate').value);
@@ -1337,6 +1880,8 @@ function submitAdd() {
     orderDate: document.getElementById('a-orderDate').value,
     projectName: document.getElementById('a-project').value.trim(),
     account,
+    contactName: document.getElementById('a-contactName').value.trim(),
+    contactPhone: document.getElementById('a-contactPhone').value.trim().replace(/\D/g, ''),
     kukerId:   document.getElementById('a-kukerId').value.trim(),
     quotePrice: quote,
     coopType:  document.getElementById('a-coopType').value,
@@ -1346,20 +1891,23 @@ function submitAdd() {
     isRebate:   document.getElementById('a-isRebate').value,
     institution: document.getElementById('a-institution').value.trim(),
     note:       document.getElementById('a-note').value.trim(),
+    contractStatus: 'none',
+    invoiceStatus: 'none',
+    planCollectDate: document.getElementById('a-planCollectDate').value,
     payments: []
   });
-  save(); renderStats(); render();
+  await saveAndSync(); renderStats(); render();
   closeModal('addOverlay');
   toast(`「${account}」已添加`,'s');
 }
 
 // ── Delete ──────────────────────────────────────
 function del(id) {
+  if (isReadonly()) { toast('只读模式，无法删除', 'e'); return; }
   const r = rows().find(x=>x.id===id); if(!r) return;
   if (!confirm(`确认删除「${r.account}」及所有收款记录？`)) return;
   db[curProj] = db[curProj].filter(x=>x.id!==id);
-  save(); renderStats(); render();
-  toast(`已删除「${r.account}」`,'s');
+  saveAndSync().then(() => { renderStats(); render(); toast(`已删除「${r.account}」`,'s'); });
 }
 
 // ── Project switch ──────────────────────────────────────
@@ -1372,14 +1920,16 @@ function switchProject() {
 // ── Export ──────────────────────────────────────
 function exportCSV() {
   const list = rows();
-  const hdrs = ['序号','媒介','订单月','订单日期','项目名称','达人账号','库客ID','达人报价','含服务费报价(+10%)','合作类型','返点比例(%)','返点金额','返点归属','安装快递抵扣','实际返点金额','是否返点','已收金额','待收余额','收回进度(%)','回收状态','挂靠机构','备注'];
+  const hdrs = ['序号','媒介','订单月','订单日期','项目名称','达人账号','联系人','手机号','库客ID','达人报价','含服务费报价(+10%)','合作类型','返点比例(%)','返点金额','返点归属','安装快递抵扣','实际返点金额','是否返点','已收金额','待收余额','收回进度(%)','回收状态','合同状态','开票状态','计划回款日','挂靠机构','备注'];
   const rows2 = list.map(r=>[
-    r.seq, r.medium, r.month, r.orderDate, r.projectName, r.account, r.kukerId,
+    r.seq, r.medium, r.month, r.orderDate, r.projectName, r.account,
+    r.contactName||'', r.contactPhone||'', r.kukerId,
     r.quotePrice, quotePriceWithFee(r).toFixed(2), r.coopType, r.rebateRate,
     rebateBase(r).toFixed(2), r.rebateAttr, r.deduction||0, actualRebate(r).toFixed(2),
     r.isRebate||'待确认', collected(r).toFixed(2), remaining(r).toFixed(2),
     pct(r).toFixed(1), {pending:'未收款',partial:'部分收回',full:'已全额收回'}[status(r)],
-    r.institution||'', r.note||''
+    CONTRACT_LABELS[r.contractStatus||'none'], INVOICE_LABELS[r.invoiceStatus||'none'],
+    r.planCollectDate||'', r.institution||'', r.note||''
   ]);
   const csv = [hdrs,...rows2].map(row=>row.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
   const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
@@ -1399,8 +1949,14 @@ function setFilter(val, el) {
 }
 
 // ── Modal helpers ──────────────────────────────────────
-function openModal(id)  { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function openModal(id)  {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  if (!document.querySelector('.overlay.open')) document.body.style.overflow = '';
+}
 function closeBg(e,id)  { if(e.target.id===id) closeModal(id); }
 
 // ── Toast ──────────────────────────────────────
@@ -1415,9 +1971,11 @@ function toast(msg, type='s') {
 
 // ── Init ──────────────────────────────────────
 (async function init() {
+  showLoading();
   try {
     await ensureAuth();
-    await migrateLocalData();
+    applyReadonlyUI();
+    if (!isReadonly()) await migrateLocalData();
     renderStats(); render();
     startPolling();
   } catch (e) {
@@ -1425,6 +1983,8 @@ function toast(msg, type='s') {
       toast('初始化失败: ' + (e.message || '未知错误'), 'e');
       setSyncStatus('error');
     }
+  } finally {
+    hideLoading();
   }
 })();
 
@@ -1440,6 +2000,8 @@ const SYSTEM_FIELDS = [
   { key: 'orderDate',    label: '订单完成时间',     required: false },
   { key: 'projectName',  label: '项目名称',         required: false },
   { key: 'account',      label: '达人账号',         required: true  },
+  { key: 'contactName',  label: '联系人',           required: false },
+  { key: 'contactPhone', label: '手机号',           required: false },
   { key: 'kukerId',      label: '库客ID',           required: false },
   { key: 'quotePrice',   label: '达人报价',         required: true  },
   { key: 'coopType',     label: '合作类型',         required: false },
@@ -1449,12 +2011,15 @@ const SYSTEM_FIELDS = [
   { key: 'isRebate',     label: '是否返点',         required: false },
   { key: 'institution',  label: '挂靠机构',         required: false },
   { key: 'note',         label: '备注',             required: false },
+  { key: 'planCollectDate', label: '计划回款日',    required: false },
   { key: '__ignore__',   label: '— 忽略此列 —',    required: false },
 ];
 
 // Keyword-based auto-mapping
 const AUTO_MAP_RULES = [
   { keys: ['达人账号','账号','kol账号','博主','达人名','达人昵称'],   field: 'account'       },
+  { keys: ['联系人','称呼','达人联系人'],                               field: 'contactName'   },
+  { keys: ['手机','手机号','电话','联系电话'],                         field: 'contactPhone'  },
   { keys: ['媒介','负责人','对接人'],                                   field: 'medium'        },
   { keys: ['订单完成月','月份','完成月'],                               field: 'month'         },
   { keys: ['订单完成时间','完成时间','日期','时间','date'],              field: 'orderDate'     },
@@ -1468,6 +2033,7 @@ const AUTO_MAP_RULES = [
   { keys: ['是否返点','返点确认'],                                      field: 'isRebate'      },
   { keys: ['挂靠','机构','挂靠机构'],                                   field: 'institution'   },
   { keys: ['备注','remark','note'],                                     field: 'note'          },
+  { keys: ['计划回款','回款日','计划回款日'],                             field: 'planCollectDate' },
   { keys: ['序号','no','#'],                                            field: 'seq'           },
 ];
 
@@ -1481,6 +2047,7 @@ let importState = {
 };
 
 function openImportModal() {
+  if (isReadonly()) { toast('只读模式，无法导入', 'e'); return; }
   resetImport();
   openModal('importOverlay');
 }
@@ -1632,9 +2199,17 @@ function applyMapping() {
       if (fieldKey === 'orderDate' && val instanceof Date) {
         val = val.toISOString().slice(0,10);
       } else if (fieldKey === 'orderDate') {
-        // try parse string date
         const d = new Date(val);
         val = isNaN(d) ? String(val) : d.toISOString().slice(0,10);
+      }
+      if (fieldKey === 'planCollectDate' && val instanceof Date) {
+        val = val.toISOString().slice(0,10);
+      } else if (fieldKey === 'planCollectDate') {
+        const d = new Date(val);
+        val = isNaN(d) ? String(val||'') : d.toISOString().slice(0,10);
+      }
+      if (fieldKey === 'contactPhone') {
+        val = String(val||'').replace(/\D/g, '');
       }
       obj[fieldKey] = val !== undefined && val !== null ? val : '';
     });
@@ -1644,6 +2219,8 @@ function applyMapping() {
       const m = parseInt((obj.orderDate||'').split('-')[1]);
       if (m) obj.month = m+'月';
     }
+    if (!obj.contractStatus) obj.contractStatus = 'none';
+    if (!obj.invoiceStatus) obj.invoiceStatus = 'none';
     return obj;
   }).filter(r => r.account); // must have account
 }
@@ -1678,7 +2255,8 @@ function renderPreview() {
 }
 
 // ── Confirm import ──
-function confirmImport() {
+async function confirmImport() {
+  if (isReadonly()) return;
   const rows = importState.parsedRows;
   if (!rows.length) { toast('没有可导入的数据','e'); return; }
 
@@ -1704,7 +2282,7 @@ function confirmImport() {
   });
 
   db[curProj].push(...toAdd);
-  save(); renderStats(); render();
+  await saveAndSync(); renderStats(); render();
   closeImport();
   toast(`成功导入 ${toAdd.length} 条达人数据`, 's');
 }
